@@ -1,6 +1,6 @@
 format-version: 1.2
-data-version: 4.1.230
-date: 16:01:2026 12:00
+data-version: 4.1.231
+date: 28:01:2026 12:00
 saved-by: Jonathan Hunter
 default-namespace: MS
 namespace-id-rule: * MS:$sequence(7,0,9999999)$
@@ -1164,7 +1164,7 @@ is_a: MS:1000121 ! SCIEX instrument model
 id: MS:1000140
 name: 4700 Proteomics Analyzer
 def: "Applied Biosystems/MDS SCIEX 4700 Proteomics Analyzer MS." [PSI:MS]
-is_a: MS:1000084 ! time-of-flight
+is_a: MS:1003922 ! tandem time-of-flight
 is_a: MS:1000495 ! Applied Biosystems instrument model
 
 [Term]
@@ -1375,7 +1375,7 @@ is_a: MS:1000493 ! Finnigan MAT instrument model
 id: MS:1000174
 name: MAT900XP Trap
 def: "ThermoFinnigan MAT900XP Trap MS." [PSI:MS]
-is_a: MS:1000080 ! magnetic sector
+is_a: MS:1003923 ! magnetic sector ion trap
 is_a: MS:1000493 ! Finnigan MAT instrument model
 
 [Term]
@@ -1389,7 +1389,7 @@ is_a: MS:1000493 ! Finnigan MAT instrument model
 id: MS:1000176
 name: MAT95XP Trap
 def: "ThermoFinnigan MAT95XP Trap MS." [PSI:MS]
-is_a: MS:1000080 ! magnetic sector
+is_a: MS:1003923 ! magnetic sector ion trap
 is_a: MS:1000493 ! Finnigan MAT instrument model
 
 [Term]
@@ -4730,7 +4730,7 @@ is_a: MS:1000121 ! SCIEX instrument model
 id: MS:1000658
 name: 4800 Proteomics Analyzer
 def: "Applied Biosystems|MDS SCIEX 4800 Proteomics Analyzer." [PSI:MS]
-is_a: MS:1000084 ! time-of-flight
+is_a: MS:1003922 ! tandem time-of-flight
 is_a: MS:1000495 ! Applied Biosystems instrument model
 
 [Term]
@@ -25169,6 +25169,20 @@ id: MS:1003921
 name: Varian gas chromatography mass spectrometry system model
 def: "Varian gas chromatography mass spectrometry system model." [PSI:MS]
 is_a: MS:1003734 ! gas chromatography mass spectrometry system model
+
+[Term]
+id: MS:1003922
+name: tandem time-of-flight
+def: "A tandem time-of-flight (TOF/TOF) mass spectrometer combines two time-of-flight mass analyzers in series, where the first TOF selects precursor ions and the second TOF analyzes fragment ions produced by post-source decay or collision-induced dissociation. This configuration enables MS/MS analysis with high mass accuracy and resolution while preserving the speed and sensitivity advantages of TOF detection." [PSI:MS]
+synonym: "TOF/TOF" EXACT []
+synonym: "TOF-TOF" EXACT []
+is_a: MS:1003761 ! instrument class
+
+[Term]
+id: MS:1003923
+name: magnetic sector ion trap
+def: "A hybrid mass spectrometer combining a high-resolution double-focusing magnetic sector analyzer with an ion trap mass analyzer. This configuration provides high-resolution precursor ion selection via the magnetic sector with subsequent highly sensitive tandem mass spectrometry (MSn) analysis in the ion trap." [PSI:MS]
+is_a: MS:1003761 ! instrument class
 
 [Term]
 id: MS:4000000
