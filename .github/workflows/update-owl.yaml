@@ -3,6 +3,8 @@ name: "Update OWL"
 on:
   push:
     branches: [master]
+  workflow_dispatch: {}    # allow manual runs
+
 
 jobs:
   generate-owl:
