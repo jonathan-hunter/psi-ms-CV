@@ -1,7 +1,7 @@
 format-version: 1.2
-data-version: 4.1.256
+data-version: 4.1.258
 date: 11:06:2026 17:15
-saved-by: Douwe Schulte
+saved-by: Jonathan Hunter
 default-namespace: MS
 namespace-id-rule: * MS:$sequence(7,0,9999999)$
 namespace-id-rule: * PEFF:$sequence(7,0,9999999)$
@@ -30,6 +30,7 @@ remark: creator: Jonathan Hunter <jhunter <-at-> ebi.ac.uk>
 remark: creator: Samuel Wein <sam <-at-> openms.de>
 remark: creator: Jeroen Van Goey <j.vangoey <-at-> instadeep.com>
 remark: creator: Jannick Kappelmann <jannick.kappelmann <-at-> gmail.com>
+remark: creator: Michael Witting <witting.michael <-at-> web.de> 
 remark: publisher: HUPO Proteomics Standards Initiative Mass Spectrometry Standards Working Group and HUPO Proteomics Standards Initiative Proteomics Informatics Working Group
 remark: When appropriate the definition and synonyms of a term are reported exactly as in the chapter 12 of IUPAC orange book. See http://www.iupac.org/projects/2003/2003-056-2-500.html and http://mass-spec.lsu.edu/msterms/index.php/Main_Page
 remark: For any queries contact psidev-ms-vocab@lists.sourceforge.net
