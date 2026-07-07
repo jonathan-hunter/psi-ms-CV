@@ -144,7 +144,13 @@ def read_catalog(tsv_path):
     or drop/truncate the row, and a vanished or shifted model would silently lose its
     stable id. Short rows are still tolerated (padded by fillna). index_col=False is
     belt-and-braces against the index-shift heuristic, and quoting=QUOTE_NONE keeps a
-    stray double-quote from merging rows and matches the raw tab-count check above."""
+    stray double-quote from merging rows and matches the raw tab-count check above.
+
+    Because QUOTE_NONE does no quote processing, a field an upstream export wrapped in
+    double quotes (the CSV convention for a value containing a comma) keeps those quotes
+    as literal characters. In the identity columns they would leak into term names and
+    — since a quoted name differs from the previously assigned unquoted one — mint fresh
+    ids and churn the mapping, so a wrapped-quote identity field ABORTS the run."""
     try:
         text = open(tsv_path, "rb").read().decode("utf-8")
     except UnicodeDecodeError as e:
@@ -169,6 +175,21 @@ def read_catalog(tsv_path):
     missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
     if missing:
         raise ValueError(f"catalog is missing required columns: {missing}")
+    # CSV-quoting guard (see docstring): a proper tab-delimited catalog wraps no field
+    # in quotes. Flag identity cells that arrive wrapped in a matched double-quote pair
+    # so the quoting is stripped upstream rather than silently corrupting names/ids.
+    quoted = sorted({
+        f"{col}={cell!r}"
+        for col in ("company", "column")
+        for cell in df[col].str.strip()
+        if len(cell) >= 2 and cell.startswith('"') and cell.endswith('"')
+    })
+    if quoted:
+        raise ValueError(
+            f"{tsv_path} has CSV-quoted identity field(s): "
+            f"{quoted[:10]}{' ...' if len(quoted) > 10 else ''}; a tab-delimited catalog "
+            "must not wrap fields in double quotes (strip the quoting upstream)"
+        )
     return df
 
 

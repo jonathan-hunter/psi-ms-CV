@@ -141,6 +141,20 @@ def test_read_catalog_missing_column_aborts(tmp_path):
         gen.read_catalog(str(p))
 
 
+def test_read_catalog_csv_quoted_identity_aborts(tmp_path):
+    # A comma-containing field an upstream export wrapped CSV-style; QUOTE_NONE keeps
+    # the quotes literal, so guard against them leaking into names/ids.
+    p = tmp_path / "c.tsv"
+    p.write_text('company\tcolumn\tmode\tusp\n"Acme, Inc"\tC18\tRP\tL1\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="CSV-quoted"):
+        gen.read_catalog(str(p))
+    # a quoted model name (column field) is caught too
+    p2 = tmp_path / "c2.tsv"
+    p2.write_text('company\tcolumn\tmode\tusp\nAcme\t"C18, wide"\tRP\tL1\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="CSV-quoted"):
+        gen.read_catalog(str(p2))
+
+
 # --- build_columns_obo: floors, dup-id, version ------------------------------
 
 def test_build_zero_models_aborts():
