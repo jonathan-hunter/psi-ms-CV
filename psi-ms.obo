@@ -37,6 +37,7 @@ remark: For any queries contact psidev-ms-vocab@lists.sourceforge.net
 remark: URL: http://purl.obolibrary.org/obo/ms/psi-ms.obo
 remark: This work is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) license.
 remark: To view a copy of this license, visit https://creativecommons.org/licenses/by/4.0/ or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+remark: test edit to trigger release
 ontology: ms
 
 [Typedef]
