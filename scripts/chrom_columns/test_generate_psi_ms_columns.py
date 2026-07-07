@@ -16,7 +16,7 @@ def m(modes=(), usps=(), ms_ids=()):
     return {"modes": Counter(modes), "usps": Counter(usps), "ms_ids": Counter(ms_ids)}
 
 
-def write_tsv(path, rows, header="company\tColumn name\tmode\tusp"):
+def write_tsv(path, rows, header="company\tcolumn\tmode\tusp"):
     path.write_text(header + "\n" + "\n".join("\t".join(r) for r in rows) + "\n", encoding="utf-8")
 
 
@@ -34,45 +34,45 @@ def test_escape_def_backslash_and_quote():
 def test_bump_patch():
     assert gen.bump_patch("4.1.255") == "4.1.256"
     assert gen.bump_patch("4.1.9") == "4.1.10"
-
-
-def test_bare_name_strips_prefix_and_guards():
-    assert gen.bare_name("Acme", "Acme C18") == "C18"
-    with pytest.raises(ValueError, match="does not start with vendor"):
-        gen.bare_name("Phenomenex", "Kinetex C18")
+    # zero-padded width is preserved (the 1.0.000 baseline)
+    assert gen.bump_patch("1.0.000") == "1.0.001"
+    assert gen.bump_patch("1.0.009") == "1.0.010"
+    assert gen.bump_patch("1.0.999") == "1.0.1000"
 
 
 def test_leaf_label_collision_suffix():
-    models = {("VendorA", "VendorA C18"): m(), ("VendorB", "VendorB C18"): m()}
-    colliding = gen.colliding_bare_names(models)
+    # Model identity is (vendor, column); a model name shared across vendors collides
+    # and gets a vendor suffix in its leaf label, a unique one does not.
+    models = {("VendorA", "C18"): m(), ("VendorB", "C18"): m()}
+    colliding = gen.colliding_names(models)
     assert "C18" in colliding
-    assert gen.leaf_label("VendorA", "VendorA C18", colliding) == "C18 (VendorA)"
-    assert gen.leaf_label("VendorA", "VendorA C8", colliding) == "C8"  # unique -> no suffix
+    assert gen.leaf_label("C18", "VendorA", colliding) == "C18 (VendorA)"
+    assert gen.leaf_label("C8", "VendorA", colliding) == "C8"  # unique -> no suffix
 
 
 # --- resolution & deviation flagging ----------------------------------------
 
-def test_resolve_usp_agree_majority_tie_empty():
-    assert gen.resolve_usp(Counter()) == ([], False)
-    assert gen.resolve_usp(Counter({"L1": 3})) == (["L1"], False)
-    assert gen.resolve_usp(Counter({"L1": 3, "L7": 1})) == (["L1"], True)  # majority + deviated
-    assert gen.resolve_usp(Counter({"L1": 1, "L7": 1})) == ([], True)      # tie -> omit
+def test_resolve_usp_agree_or_flag():
+    assert gen.resolve_usp(Counter()) == ([], False)                       # no data -> nothing, no flag
+    assert gen.resolve_usp(Counter({"L1": 3})) == (["L1"], False)          # all agree -> emit
+    assert gen.resolve_usp(Counter({"L1": 3, "L7": 1})) == ([], True)      # any disagreement -> omit + flag
+    assert gen.resolve_usp(Counter({"L1": 1, "L7": 1})) == ([], True)      # tie -> omit + flag
 
 
-def test_resolve_mode_agree_majority_tie_empty():
-    assert gen.resolve_mode(Counter()) == (None, False)
-    assert gen.resolve_mode(Counter({"RP": 3})) == ("RP", False)
-    assert gen.resolve_mode(Counter({"HILIC": 13, "RP": 1})) == ("HILIC", True)
-    assert gen.resolve_mode(Counter({"RP": 1, "HILIC": 1})) == (None, True)
+def test_resolve_mode_agree_or_flag():
+    assert gen.resolve_mode(Counter()) == (None, False)                    # no data -> nothing, no flag
+    assert gen.resolve_mode(Counter({"RP": 3})) == ("RP", False)           # all agree -> emit
+    assert gen.resolve_mode(Counter({"HILIC": 13, "RP": 1})) == (None, True)  # any disagreement -> omit + flag
+    assert gen.resolve_mode(Counter({"RP": 1, "HILIC": 1})) == (None, True)   # tie -> omit + flag
 
 
 def test_resolve_model_reports_deviations():
     mode, codes, dev = gen.resolve_model(m(modes=["RP", "RP"], usps=["L1", "L1"]))
     assert (mode, codes, dev) == ("RP", ["L1"], {})
-    _, _, dev = gen.resolve_model(m(modes=["RP", "HILIC", "HILIC"], usps=["L1", "L1", "L1"]))
-    assert "mode" in dev and "usp" not in dev
+    mode, _, dev = gen.resolve_model(m(modes=["RP", "HILIC", "HILIC"], usps=["L1", "L1", "L1"]))
+    assert mode is None and "mode" in dev and "usp" not in dev   # disagreement -> omit + flag
     mode, codes, dev = gen.resolve_model(m(modes=["RP"], usps=["L1", "L7"]))
-    assert codes == [] and "usp" in dev   # tie -> omit + flag
+    assert codes == [] and "usp" in dev   # disagreement -> omit + flag
 
 
 # --- id assignment -----------------------------------------------------------
@@ -95,8 +95,8 @@ def test_assign_ids_out_of_band_reuse_raises():
 # --- mirror cross-check ------------------------------------------------------
 
 def _mirror(ms_ids, existing):
-    models = {("V", "V A"): m(ms_ids=ms_ids)}
-    return gen.cross_check_mirror(models, {("V", "V A"): "A"}, {"A": "MS:5001000"}, existing)
+    models = {("V", "A"): m(ms_ids=ms_ids)}
+    return gen.cross_check_mirror(models, {("V", "A"): "A"}, {"A": "MS:5001000"}, existing)
 
 
 def test_mirror_blank_and_agree_pass():
@@ -105,7 +105,7 @@ def test_mirror_blank_and_agree_pass():
 
 
 def test_mirror_rename_warns_not_aborts():
-    assert _mirror(["MS:5008888"], {}) == [("V A", "MS:5008888", "MS:5001000")]
+    assert _mirror(["MS:5008888"], {}) == [("A", "MS:5008888", "MS:5001000")]
 
 
 def test_mirror_drift_aborts():
@@ -122,23 +122,37 @@ def test_mirror_row_conflict_aborts():
 
 def test_read_catalog_overlength_aborts(tmp_path):
     p = tmp_path / "c.tsv"
-    write_tsv(p, [["A", "A X", "RP", "L1", "EXTRA"]])
+    write_tsv(p, [["A", "X", "RP", "L1", "EXTRA"]])
     with pytest.raises(ValueError, match="over-length"):
         gen.read_catalog(str(p))
 
 
 def test_read_catalog_short_row_padded(tmp_path):
     p = tmp_path / "c.tsv"
-    p.write_text("company\tColumn name\tmode\tusp\nA\tA X\tRP\n", encoding="utf-8")
+    p.write_text("company\tcolumn\tmode\tusp\nA\tX\tRP\n", encoding="utf-8")
     df = gen.read_catalog(str(p))
     assert df.iloc[0]["usp"] == ""
 
 
 def test_read_catalog_missing_column_aborts(tmp_path):
     p = tmp_path / "c.tsv"
-    p.write_text("company\tColumn name\tmode\nA\tA X\tRP\n", encoding="utf-8")
+    p.write_text("company\tcolumn\tmode\nA\tX\tRP\n", encoding="utf-8")
     with pytest.raises(ValueError, match="missing required columns"):
         gen.read_catalog(str(p))
+
+
+def test_read_catalog_csv_quoted_identity_aborts(tmp_path):
+    # A comma-containing field an upstream export wrapped CSV-style; QUOTE_NONE keeps
+    # the quotes literal, so guard against them leaking into names/ids.
+    p = tmp_path / "c.tsv"
+    p.write_text('company\tcolumn\tmode\tusp\n"Acme, Inc"\tC18\tRP\tL1\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="CSV-quoted"):
+        gen.read_catalog(str(p))
+    # a quoted model name (column field) is caught too
+    p2 = tmp_path / "c2.tsv"
+    p2.write_text('company\tcolumn\tmode\tusp\nAcme\t"C18, wide"\tRP\tL1\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="CSV-quoted"):
+        gen.read_catalog(str(p2))
 
 
 # --- build_columns_obo: floors, dup-id, version ------------------------------
@@ -150,14 +164,14 @@ def test_build_zero_models_aborts():
 
 def test_build_shrink_floor_aborts():
     existing = {f"leaf{i}": f"MS:{5001000 + i}" for i in range(100)}
-    models = {("Acme", "Acme C18"): m(modes=["RP"], usps=["L1"])}
+    models = {("Acme", "C18"): m(modes=["RP"], usps=["L1"])}
     with pytest.raises(ValueError, match="shrank"):
         gen.build_columns_obo(models, existing)
 
 
 def test_build_duplicate_id_aborts():
-    models = {("Acme", "Acme C18"): m(modes=["RP"], usps=["L1"]),
-              ("Acme", "Acme C8"): m(modes=["RP"], usps=["L7"])}
+    models = {("Acme", "C18"): m(modes=["RP"], usps=["L1"]),
+              ("Acme", "C8"): m(modes=["RP"], usps=["L7"])}
     existing = {"C18": "MS:5001000", "C8": "MS:5001000",
                 "Acme chromatographic column model": "MS:5000001"}
     with pytest.raises(ValueError, match="duplicate ids"):
@@ -165,7 +179,7 @@ def test_build_duplicate_id_aborts():
 
 
 def test_version_bumps_only_on_change():
-    models = {("Acme", "Acme C18"): m(modes=["RP"], usps=["L1"])}
+    models = {("Acme", "C18"): m(modes=["RP"], usps=["L1"])}
     obo1, _, _ = gen.build_columns_obo(models, {})
     assert f"data-version: {gen.DATA_VERSION}" in obo1
     body = obo1[obo1.index("[Term]"):]
@@ -173,7 +187,7 @@ def test_version_bumps_only_on_change():
     obo2, _, _ = gen.build_columns_obo(models, existing, gen.DATA_VERSION, body)
     assert f"data-version: {gen.DATA_VERSION}" in obo2            # unchanged -> hold
     models2 = dict(models)
-    models2[("Acme", "Acme C8")] = m(modes=["RP"], usps=["L7"])
+    models2[("Acme", "C8")] = m(modes=["RP"], usps=["L7"])
     existing2 = dict(existing)
     existing2["C8"] = "MS:5001001"
     obo3, _, _ = gen.build_columns_obo(models2, existing2, gen.DATA_VERSION, body)
@@ -186,14 +200,15 @@ def test_integration_loads_stable_and_renames(tmp_path):
     import fastobo
 
     p = tmp_path / "c.tsv"
-    write_tsv(p, [["Acme", "Acme C18", "RP", "L1"], ["Acme", "Acme C8", "HILIC", "L114"]])
+    write_tsv(p, [["Acme", "C18", "RP", "L1"], ["Acme", "C8", "HILIC", "L114"]])
     models = gen.load_models(str(p))
     obo, mapping, report = gen.build_columns_obo(models, {})
 
     out = tmp_path / "o.obo"
     out.write_text(obo, encoding="utf-8")
     fastobo.load(str(out))                                   # valid OBO
-    assert mapping.startswith("company\tColumn name\tpsi_ms_id\n")
+    assert mapping.startswith("company\tcolumn\tpsi_ms_id\n")
+    assert "Acme\tC18\t" in mapping                          # join key is (company, column)
 
     existing = gen.read_existing_ids(str(out))
     obo2, _, _ = gen.build_columns_obo(models, existing)
@@ -201,7 +216,7 @@ def test_integration_loads_stable_and_renames(tmp_path):
 
     # rename C18 -> C19: new label mints the next free id, old id retired
     p2 = tmp_path / "c2.tsv"
-    write_tsv(p2, [["Acme", "Acme C19", "RP", "L1"], ["Acme", "Acme C8", "HILIC", "L114"]])
+    write_tsv(p2, [["Acme", "C19", "RP", "L1"], ["Acme", "C8", "HILIC", "L114"]])
     obo3, _, _ = gen.build_columns_obo(gen.load_models(str(p2)), existing)
     out3 = tmp_path / "o3.obo"
     out3.write_text(obo3, encoding="utf-8")
@@ -215,7 +230,7 @@ def test_integration_backslash_name_escaped(tmp_path):
     import fastobo
 
     p = tmp_path / "c.tsv"
-    write_tsv(p, [["Acme", "Acme C18\\", "RP", "L1"]])
+    write_tsv(p, [["Acme", "C18\\", "RP", "L1"]])
     obo, _, _ = gen.build_columns_obo(gen.load_models(str(p)), {})
     out = tmp_path / "o.obo"
     out.write_text(obo, encoding="utf-8")
