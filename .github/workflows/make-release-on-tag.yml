@@ -10,13 +10,28 @@ jobs:
   make-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
       - name: Extract version from OBO
         run: |
           CV_VERSION=`grep data-version psi-ms.obo | grep -oP "(\d+.\d+.\d+)"`
           echo CV_VERSION=${CV_VERSION}
           echo "CV_VERSION=${CV_VERSION}" >> $GITHUB_ENV
           cp psi-ms.owl ms.owl
+      - name: Merge column models into the released psi-ms.obo
+        # The MS:5000000 chromatographic-column terms live in psi-ms-columns.obo (kept
+        # out of master, regenerated weekly from repo-rt). Splice them into the psi-ms.obo
+        # that gets published so the released OBO carries them too, matching the OWL
+        # (update-owl.yaml robot-merges the same module). The repo's master psi-ms.obo is
+        # unchanged; only the runner's working copy is merged, then validated.
+        run: |
+          python -m pip install "fastobo==0.14.1"
+          python scripts/chrom_columns/build_release_obo.py \
+            psi-ms.obo psi-ms-columns.obo psi-ms.obo
+          python -c "import fastobo; fastobo.load('psi-ms.obo')"
+          python scripts/check_sorted.py psi-ms.obo
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
