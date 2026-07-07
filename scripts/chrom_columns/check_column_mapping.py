@@ -14,7 +14,7 @@ import re
 import sys
 from collections import Counter
 
-HEADER = "company\tColumn name\tpsi_ms_id"
+HEADER = "company\tcolumn\tpsi_ms_id"
 LEAF_LO, LEAF_HI = 5001000, 5999999
 ID_RE = re.compile(r"^MS:(\d{7})$")
 

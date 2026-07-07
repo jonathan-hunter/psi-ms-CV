@@ -1,5 +1,5 @@
 format-version: 1.2
-data-version: 1.0.000
+data-version: 1.0.001
 saved-by: Jonathan Hunter
 default-namespace: MS
 ontology: ms-columns
@@ -1325,10 +1325,9 @@ property_value: usp_designation: "L60" xsd:string
 [Term]
 id: MS:5001107
 name: Accucore 150-Amide-HILIC
-def: "A HILIC liquid chromatographic column model manufactured by Thermo Scientific." [PSI:MS]
+def: "A liquid chromatographic column model manufactured by Thermo Scientific." [PSI:MS]
 is_a: MS:5000056 ! Thermo Scientific chromatographic column model
 is_a: MS:1003921 ! liquid chromatographic column
-relationship: has_separation_mode MS:1003584 ! hydrophilic interaction liquid chromatography
 property_value: usp_designation: "L68" xsd:string
 
 [Term]

@@ -12,15 +12,12 @@ holding the whole column-model branch in the MS:5000000 namespace:
           relationship: has_separation_mode ...               (when known)
           property_value: usp_designation: "..." xsd:string   (per USP code)
 
-The catalog is expected to be already clean and enriched: valid UTF-8 with product
-names and USP codes corrected (.jeh-local/fix_column_database.py) and the "mode"
-column filled from USP codes (.jeh-local/fill_separation_mode.py), both intended to
-land in repo-rt itself. This generator does not correct or infer data — it only
+This generator does not correct or infer data — it only
 verifies the input is valid UTF-8 and well-formed (correct field counts) and aborts
 otherwise. Separation mode is read from the "mode" column and USP designation from
-the "usp" column; each should be identical on every row of a model, so any
-within-model disagreement is reported for upstream fixing (the clear majority is
-emitted meanwhile; a tie emits nothing for that field).
+the "usp" column; each should be identical on every row of a model, so a field is
+emitted only when every row agrees — any within-model disagreement emits nothing for
+that field and is reported for upstream fixing (no majority guess is made).
 
 References to MS:1000857, MS:1003920, MS:1003921 and the MS:1002271 technique
 terms are external to this module and resolve against psi-ms.obo, with which it is
@@ -79,7 +76,8 @@ LIQUID_COLUMN = "MS:1003921"
 
 # Base/reset data-version; build_columns_obo bumps the patch component whenever the
 # regenerated term body differs from the committed module (see read_prior_module).
-DATA_VERSION = "4.1.255"
+# psi-ms-columns.obo versions independently of psi-ms.obo, starting at 1.0.000.
+DATA_VERSION = "1.0.000"
 
 
 def build_header(data_version):
@@ -90,7 +88,7 @@ saved-by: Jonathan Hunter
 default-namespace: MS
 ontology: ms-columns
 remark: Model-level chromatographic column terms (MS:5000000 namespace), generated from the repo-rt column database.
-remark: Merged with psi-ms.obo (via robot merge in update-owl.yaml) to build the published OWL; its is_a / part_of / has_separation_mode targets (MS:1000857, MS:1003920, MS:1003921, and the MS:1002271 separation-technique terms) are defined in psi-ms.obo.
+remark: Merged with psi-ms.obo (via robot merge in update-owl.yaml) to build the published OWL.
 remark: coverage of namespace-id: MS:$sequence(7,5000000,5999999)$: Chromatographic column models
 
 [Typedef]
@@ -112,9 +110,8 @@ MODE_INFO = {
     "mixed": ("MS:1003586", "mixed mode chromatography", "mixed-mode"),
 }
 
-# repo-rt "mode" column value -> separation-mode key. The IEX/SEC/NP tokens are
-# populated upstream by .jeh-local/fill_separation_mode.py (inferred from USP
-# codes); "other", "NA" and blank stay unmapped (no has_separation_mode emitted).
+# repo-rt "mode" column value -> separation-mode key. 
+# "other", "NA" and blank stay unmapped (no has_separation_mode emitted).
 TSV_MODE = {
     "RP": "RP",
     "NP": "NP",
@@ -126,7 +123,7 @@ TSV_MODE = {
 
 # --- reading the catalog ----------------------------------------------------
 
-REQUIRED_COLUMNS = ("company", "Column name", "mode", "usp")
+REQUIRED_COLUMNS = ("company", "column", "mode", "usp")
 
 
 def clean(text):
@@ -153,7 +150,6 @@ def read_catalog(tsv_path):
     except UnicodeDecodeError as e:
         raise ValueError(
             f"{tsv_path} is not valid UTF-8 ({e}); the catalog must be pre-cleaned "
-            "(see .jeh-local/fix_column_database.py)"
         )
     lines = text.split("\n")
     ncols = len(lines[0].split("\t")) if lines and lines[0] else 0
@@ -183,17 +179,31 @@ def load_models(tsv_path):
     (vendor, product) lets resolve_model vote over those rows. USP cells are
     normalized before counting so representational variants ("L1/L11" vs "L11/L1")
     aggregate instead of tying.
+
+    product is the model name read straight from the catalog's "column" field (e.g.
+    "ACE C18" for company "Advanced Chromatography Technologies") — the authoritative,
+    vendor-stripped model label. (vendor, product) is the model's identity throughout:
+    the grouping key, the leaf-label base, and the repo-rt mapping join key.
     """
     df = read_catalog(tsv_path)
-    # psi_ms_id is an optional mirror column (absent on the first catalog); default
-    # to "" so the cross-check simply sees no ids rather than raising on a KeyError.
-    ms_id = df["psi_ms_id"].map(lambda s: s.strip()) if "psi_ms_id" in df.columns else ""
+    # psi_ms_id is an optional mirror column (absent on the first catalog); default to
+    # an all-"" Series so the cross-check simply sees no ids rather than raising on a
+    # KeyError. Both branches yield a Series (never a bare scalar) so the column is a
+    # consistent type for static analysis as well as pandas' scalar broadcasting.
+    if "psi_ms_id" in df.columns:
+        ms_id = df["psi_ms_id"].str.strip()
+    else:
+        ms_id = pd.Series("", index=df.index, dtype=str)
+    # Whitespace is trimmed with the vectorized .str.strip() accessor rather than a
+    # per-element lambda: it is typed to return a string Series, so the callbacks below
+    # never touch .strip() on a cell the checker widens to NAType (read_catalog's
+    # dtype=str/na_filter=False guarantee a real str at runtime regardless).
     df = df.assign(
-        vendor=df["company"].map(lambda s: clean(s.strip())),
-        product=df["Column name"].map(lambda s: clean(s.strip())),
+        vendor=df["company"].str.strip().map(clean),
+        product=df["column"].str.strip().map(clean),
         # "" (not None) for unknown modes / no codes so the columns stay all-string
         # (a None would become a truthy NaN and slip past the `if` filters below).
-        mode_key=df["mode"].map(lambda m: TSV_MODE.get(m.strip(), "")),
+        mode_key=df["mode"].str.strip().map(lambda m: TSV_MODE.get(str(m), "")),
         usp_canon=df["usp"].map(lambda u: "/".join(sorted(split_usp_codes(u), key=usp_sort_key))),
         ms_id=ms_id,
     )
@@ -227,35 +237,27 @@ def resolve_usp(usp_counter):
     """Resolve a model's USP designation from its per-row cells.
 
     A column model should carry the same USP code (or combined cell) on every row, so
-    this returns (codes, deviated): codes is the value to emit and deviated flags any
-    within-model disagreement for the report, so it is fixed upstream rather than
-    silently outvoted. When rows disagree but one value is the clear majority that
-    value is still emitted (a best guess pending the fix); a top tie (e.g. an Excel
-    drag-down series L1, L2, L3 ... one row each) has no trustworthy value and emits
-    nothing.
+    this returns (codes, deviated): when every row agrees, codes is that single value
+    and deviated is False; when the rows disagree at all, there is no trustworthy value
+    so codes is empty and deviated is True, flagging the model for an upstream fix. No
+    majority vote is taken — any inconsistency is surfaced rather than guessed through.
     """
-    if not usp_counter:
-        return [], False
-    ranked = usp_counter.most_common()
-    deviated = len(ranked) > 1
-    if deviated and ranked[0][1] == ranked[1][1]:
-        return [], True
-    return sorted(split_usp_codes(ranked[0][0]), key=usp_sort_key), deviated
+    if len(usp_counter) == 1:
+        (value,) = usp_counter
+        return sorted(split_usp_codes(value), key=usp_sort_key), False
+    return [], len(usp_counter) > 1
 
 
 def resolve_mode(mode_counter):
     """Resolve a model's separation mode from its per-row cells, like resolve_usp.
 
-    Returns (mode_key or None, deviated): a clear majority is emitted as a best guess,
-    a top tie emits nothing rather than asserting an arbitrary winner, and any
-    disagreement sets deviated for the report."""
-    if not mode_counter:
-        return None, False
-    ranked = mode_counter.most_common()
-    deviated = len(ranked) > 1
-    if deviated and ranked[0][1] == ranked[1][1]:
-        return None, True
-    return ranked[0][0], deviated
+    Returns (mode_key or None, deviated): a single agreed value is emitted, any
+    disagreement emits nothing and sets deviated for the report, and no-data emits
+    nothing without flagging."""
+    if len(mode_counter) == 1:
+        (value,) = mode_counter
+        return value, False
+    return None, len(mode_counter) > 1
 
 
 def resolve_model(entry):
@@ -265,8 +267,8 @@ def resolve_model(entry):
     usp_literals  USP codes to emit as usp_designation (empty when unresolved).
     deviations    {field: {value: count}} for every field (usp, mode) whose rows do
                   not agree, surfaced in the report so the inconsistency is fixed
-                  upstream. A field with a clear majority still emits that majority as
-                  a best guess; a tie emits nothing for that field.
+                  upstream. A field whose rows disagree emits nothing (no majority
+                  guess); only a field on which every row agrees is emitted.
     """
     codes, usp_deviated = resolve_usp(entry["usps"])
     mode, mode_deviated = resolve_mode(entry["modes"])
@@ -280,30 +282,19 @@ def resolve_model(entry):
 
 # --- naming ------------------------------------------------------------------
 
-def bare_name(vendor, product):
-    """Product name with the leading vendor string removed. The vendor is always a
-    prefix in the repo-rt catalog; fail loudly if a future row breaks that rather than
-    blindly slicing len(vendor) chars off the wrong string and minting a garbled
-    label (and thus a wrong id / mapping key)."""
-    if not product.startswith(vendor):
-        raise ValueError(
-            f"product {product!r} does not start with vendor {vendor!r} "
-            "(fix in the upstream catalog)"
-        )
-    return product[len(vendor):].strip()
-
-
-def colliding_bare_names(models):
-    """Bare names shared by more than one vendor (need vendor disambiguation)."""
-    vendors_by_bare = defaultdict(set)
+def colliding_names(models):
+    """Model names (the catalog "column" field) shared by more than one vendor and so
+    needing vendor disambiguation in the leaf label."""
+    vendors_by_name = defaultdict(set)
     for vendor, product in models:
-        vendors_by_bare[bare_name(vendor, product)].add(vendor)
-    return {name for name, vendors in vendors_by_bare.items() if len(vendors) > 1}
+        vendors_by_name[product].add(vendor)
+    return {name for name, vendors in vendors_by_name.items() if len(vendors) > 1}
 
 
-def leaf_label(vendor, product, colliding):
-    name = bare_name(vendor, product)
-    return f"{name} ({vendor})" if name in colliding else name
+def leaf_label(product, vendor, colliding):
+    """Leaf term label: the model name, suffixed with the vendor only when that name is
+    shared across vendors (so the emitted labels stay unique)."""
+    return f"{product} ({vendor})" if product in colliding else product
 
 
 def with_period(sentence):
@@ -337,24 +328,28 @@ def leaf_definition(vendor, mode):
 # --- stanza builders (return text, no trailing blank line) ------------------
 
 def parent_stanza():
-    return (
-        f"[Term]\nid: {PARENT_ID}\n"
-        "name: chromatographic column model\n"
+    lines = [
+        "[Term]",
+        f"id: {PARENT_ID}",
+        "name: chromatographic column model",
         'def: "A specific chromatographic column product, identified by its '
-        'manufacturer and product name." [PSI:MS]\n'
-        f"is_a: {RUN_ATTRIBUTE} ! run attribute\n"
-        f"relationship: part_of {CHROM_COLUMN} ! chromatographic column"
-    )
+        'manufacturer and product name." [PSI:MS]',
+        f"is_a: {RUN_ATTRIBUTE} ! run attribute",
+        f"relationship: part_of {CHROM_COLUMN} ! chromatographic column",
+    ]
+    return "\n".join(lines)
 
 
 def vendor_stanza(vendor, vendor_id):
-    definition = with_period(f"Chromatographic column models manufactured by {vendor}")
-    return (
-        f"[Term]\nid: {vendor_id}\n"
-        f"name: {escape_tag(vendor)} chromatographic column model\n"
-        f'def: "{escape_def(definition)}" [PSI:MS]\n'
-        f"is_a: {PARENT_ID} ! chromatographic column model"
-    )
+    definition = with_period(f"Chromatographic column model manufactured by {vendor}")
+    lines = [
+        "[Term]",
+        f"id: {vendor_id}",
+        f"name: {escape_tag(vendor)} chromatographic column model",
+        f'def: "{escape_def(definition)}" [PSI:MS]',
+        f"is_a: {PARENT_ID} ! chromatographic column model",
+    ]
+    return "\n".join(lines)
 
 
 def leaf_stanza(leaf_id, vendor, vendor_id, label, mode, usp_literals):
@@ -392,9 +387,10 @@ def read_existing_ids(path):
 
 
 def bump_patch(version):
-    """Increment the trailing numeric component of a dotted version (4.1.255 -> 4.1.256)."""
+    """Increment the trailing numeric component of a dotted version (1.0.000 -> 1.0.001),
+    preserving its zero-padded width so a padded baseline keeps padding (1.0.009 -> 1.0.010)."""
     parts = version.split(".")
-    parts[-1] = str(int(parts[-1]) + 1)
+    parts[-1] = str(int(parts[-1]) + 1).zfill(len(parts[-1]))
     return ".".join(parts)
 
 
@@ -470,14 +466,15 @@ def cross_check_mirror(models, labels, leaf_ids, existing):
 
 
 def build_mapping_tsv(models, labels, leaf_ids):
-    """Return the (company, Column name, psi_ms_id) mapping text -- the cross-repo
-    contract repo-rt joins on. Keys are the cleaned company / Column name; clean()
-    drops the C0 control chars (including tab and newline), so no value can contain a
-    TSV delimiter and the rows need no quoting."""
+    """Return the (company, column, psi_ms_id) mapping text -- the cross-repo contract
+    repo-rt joins on (its add_psi_ms_id.py must join on the same company + column keys).
+    Keys are the cleaned company / column; clean() drops the C0 control chars (including
+    tab and newline), so no value can contain a TSV delimiter and the rows need no
+    quoting."""
     rows = sorted(
         (vendor, product, leaf_ids[labels[(vendor, product)]]) for vendor, product in models
     )
-    lines = ["company\tColumn name\tpsi_ms_id"]
+    lines = ["company\tcolumn\tpsi_ms_id"]
     lines += [f"{c}\t{n}\t{i}" for c, n, i in rows]
     return "\n".join(lines) + "\n"
 
@@ -499,7 +496,7 @@ def build_columns_obo(models, existing, prior_version=None, prior_body=None):
             "download. Re-run with --reset-ids if this drop is intentional."
         )
 
-    colliding = colliding_bare_names(models)
+    colliding = colliding_names(models)
     vendors = sorted({vendor for vendor, _ in models})
 
     vendor_ids = assign_ids(
@@ -507,7 +504,7 @@ def build_columns_obo(models, existing, prior_version=None, prior_body=None):
     )
     vendor_id = {v: vendor_ids[f"{v} chromatographic column model"] for v in vendors}
 
-    labels = {(v, p): leaf_label(v, p, colliding) for v, p in models}
+    labels = {(v, p): leaf_label(p, v, colliding) for v, p in models}
     # Each emitted leaf needs a unique label (and thus id). leaf_label only
     # disambiguates names shared ACROSS vendors, so guard against two products of
     # one vendor reducing to the same label (e.g. an upstream whitespace variant),
@@ -591,7 +588,7 @@ def main():
     parser.add_argument("--input", default=INPUT_DEFAULT, help="repo-rt column TSV")
     parser.add_argument("--output", default=OUTPUT_DEFAULT, help="OBO module to write")
     parser.add_argument("--mapping", default=MAPPING_DEFAULT,
-                        help="company/Column name -> psi_ms_id TSV (repo-rt back-prop contract)")
+                        help="company/column -> psi_ms_id TSV (repo-rt back-prop contract)")
     parser.add_argument("--reset-ids", action="store_true",
                         help="ignore existing ids in --output and assign clean sequential ids")
     parser.add_argument("--report", help="write a Markdown data-quality summary to this path")
