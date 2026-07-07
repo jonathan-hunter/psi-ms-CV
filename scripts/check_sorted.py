@@ -2,14 +2,14 @@ import sys
 
 import fastobo
 
-cv = fastobo.load(sys.argv[1])
+cv = fastobo.load(sys.argv[1])  # type: ignore
 
 terms = list(cv)
 in_order = True
 last = None
 conflicts = []
 for i, t in enumerate(terms):
-    if isinstance(t, fastobo.term.TermFrame):
+    if isinstance(t, fastobo.term.TermFrame):   # type: ignore
         if t.id.prefix == 'NCIT':
             continue
         if last is None:

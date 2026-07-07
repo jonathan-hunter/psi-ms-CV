@@ -97,6 +97,10 @@ jobs:
             .github/repo-rt/psi-ms-column-ids.tsv
           branch: sync/repo-rt-column-models
           delete-branch: true
-          commit-message: "Sync chromatographic column models from repo-rt"
+          commit-message: |
+            Sync chromatographic column models from repo-rt
+
+            Co-authored-by: Jonathan Hunter <137391756+jonathan-hunter@users.noreply.github.com>
+            Co-authored-by: Michael Witting <2734706+michaelwitting@users.noreply.github.com>
           title: "Sync chromatographic column models from repo-rt"
           body: ${{ steps.prbody.outputs.body }}
