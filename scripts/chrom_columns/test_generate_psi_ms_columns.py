@@ -16,6 +16,10 @@ def m(modes=(), usps=(), ms_ids=()):
     return {"modes": Counter(modes), "usps": Counter(usps), "ms_ids": Counter(ms_ids)}
 
 
+# The shared data-version source (psi-ms.obo's version) that build_columns_obo mirrors.
+MS_VER = "4.1.258"
+
+
 def write_tsv(path, rows, header="company\tcolumn\tmode\tusp"):
     path.write_text(header + "\n" + "\n".join("\t".join(r) for r in rows) + "\n", encoding="utf-8")
 
@@ -159,14 +163,14 @@ def test_read_catalog_csv_quoted_identity_aborts(tmp_path):
 
 def test_build_zero_models_aborts():
     with pytest.raises(ValueError, match="0 column models"):
-        gen.build_columns_obo({}, {})
+        gen.build_columns_obo({}, {}, MS_VER)
 
 
 def test_build_shrink_floor_aborts():
     existing = {f"leaf{i}": f"MS:{5001000 + i}" for i in range(100)}
     models = {("Acme", "C18"): m(modes=["RP"], usps=["L1"])}
     with pytest.raises(ValueError, match="shrank"):
-        gen.build_columns_obo(models, existing)
+        gen.build_columns_obo(models, existing, MS_VER)
 
 
 def test_build_duplicate_id_aborts():
@@ -175,23 +179,55 @@ def test_build_duplicate_id_aborts():
     existing = {"C18": "MS:5001000", "C8": "MS:5001000",
                 "Acme chromatographic column model": "MS:5000001"}
     with pytest.raises(ValueError, match="duplicate ids"):
-        gen.build_columns_obo(models, existing)
+        gen.build_columns_obo(models, existing, MS_VER)
 
 
-def test_version_bumps_only_on_change():
+def test_resolve_shared_version():
+    # no prior module -> adopt psi-ms's version, no bump
+    assert gen.resolve_shared_version("4.1.258", None, None, "body") == ("4.1.258", False)
+    # unchanged body -> keep the module's own prior version, no bump
+    assert gen.resolve_shared_version("4.1.258", "4.1.258", "body", "body") == ("4.1.258", False)
+    # changed body -> bump one patch above psi-ms's version, flag psi-ms bump
+    assert gen.resolve_shared_version("4.1.258", "4.1.258", "old", "new") == ("4.1.259", True)
+    # changed body while the module lags psi-ms -> bump above psi-ms (the higher one)
+    assert gen.resolve_shared_version("4.1.260", "4.1.258", "old", "new") == ("4.1.261", True)
+
+
+def test_build_reports_version_and_bump():
     models = {("Acme", "C18"): m(modes=["RP"], usps=["L1"])}
-    obo1, _, _ = gen.build_columns_obo(models, {})
-    assert f"data-version: {gen.DATA_VERSION}" in obo1
+    # first build (no prior): mirrors psi-ms's version, does not ask to bump psi-ms
+    obo1, _, report1 = gen.build_columns_obo(models, {}, MS_VER)
+    assert f"data-version: {MS_VER}" in obo1
+    assert report1["version"] == MS_VER and report1["psi_ms_bumped"] is False
     body = obo1[obo1.index("[Term]"):]
+
     existing = {"C18": "MS:5001000", "Acme chromatographic column model": "MS:5000001"}
-    obo2, _, _ = gen.build_columns_obo(models, existing, gen.DATA_VERSION, body)
-    assert f"data-version: {gen.DATA_VERSION}" in obo2            # unchanged -> hold
+    # unchanged body -> hold version, no psi-ms bump
+    _, _, report2 = gen.build_columns_obo(models, existing, MS_VER, MS_VER, body)
+    assert report2["version"] == MS_VER and report2["psi_ms_bumped"] is False
+
+    # changed body -> shared version bumps and psi-ms must follow
     models2 = dict(models)
     models2[("Acme", "C8")] = m(modes=["RP"], usps=["L7"])
-    existing2 = dict(existing)
-    existing2["C8"] = "MS:5001001"
-    obo3, _, _ = gen.build_columns_obo(models2, existing2, gen.DATA_VERSION, body)
-    assert f"data-version: {gen.bump_patch(gen.DATA_VERSION)}" in obo3  # changed -> bump
+    existing2 = {**existing, "C8": "MS:5001001"}
+    obo3, _, report3 = gen.build_columns_obo(models2, existing2, MS_VER, MS_VER, body)
+    assert report3["version"] == gen.bump_patch(MS_VER) and report3["psi_ms_bumped"] is True
+    assert f"data-version: {gen.bump_patch(MS_VER)}" in obo3
+
+
+def test_read_and_set_psi_ms_version(tmp_path):
+    p = tmp_path / "psi-ms.obo"
+    p.write_text(
+        "format-version: 1.2\ndata-version: 4.1.258\ndate: 01:01:2026 00:00\n"
+        "ontology: ms\n\n[Term]\nid: MS:1000001\nname: x\n", encoding="utf-8")
+    assert gen.read_data_version(str(p)) == "4.1.258"
+    gen.set_psi_ms_version(str(p), "4.1.259", date="07:07:2026 10:00")
+    text = p.read_text(encoding="utf-8")
+    assert "data-version: 4.1.259" in text and "date: 07:07:2026 10:00" in text
+    assert "[Term]\nid: MS:1000001\nname: x\n" in text        # body untouched
+    # date left alone when not supplied
+    gen.set_psi_ms_version(str(p), "4.1.260")
+    assert "data-version: 4.1.260" in p.read_text() and "date: 07:07:2026 10:00" in p.read_text()
 
 
 # --- integration -------------------------------------------------------------
@@ -202,7 +238,7 @@ def test_integration_loads_stable_and_renames(tmp_path):
     p = tmp_path / "c.tsv"
     write_tsv(p, [["Acme", "C18", "RP", "L1"], ["Acme", "C8", "HILIC", "L114"]])
     models = gen.load_models(str(p))
-    obo, mapping, report = gen.build_columns_obo(models, {})
+    obo, mapping, report = gen.build_columns_obo(models, {}, MS_VER)
 
     out = tmp_path / "o.obo"
     out.write_text(obo, encoding="utf-8")
@@ -211,13 +247,13 @@ def test_integration_loads_stable_and_renames(tmp_path):
     assert "Acme\tC18\t" in mapping                          # join key is (company, column)
 
     existing = gen.read_existing_ids(str(out))
-    obo2, _, _ = gen.build_columns_obo(models, existing)
+    obo2, _, _ = gen.build_columns_obo(models, existing, MS_VER)
     assert obo2 == obo                                       # stable ids -> identical
 
     # rename C18 -> C19: new label mints the next free id, old id retired
     p2 = tmp_path / "c2.tsv"
     write_tsv(p2, [["Acme", "C19", "RP", "L1"], ["Acme", "C8", "HILIC", "L114"]])
-    obo3, _, _ = gen.build_columns_obo(gen.load_models(str(p2)), existing)
+    obo3, _, _ = gen.build_columns_obo(gen.load_models(str(p2)), existing, MS_VER)
     out3 = tmp_path / "o3.obo"
     out3.write_text(obo3, encoding="utf-8")
     ids = gen.read_existing_ids(str(out3))
@@ -231,7 +267,7 @@ def test_integration_backslash_name_escaped(tmp_path):
 
     p = tmp_path / "c.tsv"
     write_tsv(p, [["Acme", "C18\\", "RP", "L1"]])
-    obo, _, _ = gen.build_columns_obo(gen.load_models(str(p)), {})
+    obo, _, _ = gen.build_columns_obo(gen.load_models(str(p)), {}, MS_VER)
     out = tmp_path / "o.obo"
     out.write_text(obo, encoding="utf-8")
     fastobo.load(str(out))                                   # no fold / no crash

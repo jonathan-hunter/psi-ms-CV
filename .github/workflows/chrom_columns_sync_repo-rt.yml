@@ -50,10 +50,15 @@ jobs:
         # then overwrites it; only new vendors/models get fresh IDs. Also rewrites
         # the .github/repo-rt/psi-ms-column-ids.tsv mapping (the contract repo-rt joins
         # on) and aborts if the catalog's psi_ms_id column drifts from the assigned IDs.
+        # psi-ms.obo and psi-ms-columns.obo share one data-version: when the column body
+        # changes, the shared version is bumped in BOTH files (--psi-ms / --date), so the
+        # sync PR bumps psi-ms.obo and the existing tag/release trigger cuts a release.
         run: |
           python scripts/chrom_columns/generate_psi_ms_columns.py \
             --input column_database.tsv \
             --output psi-ms-columns.obo \
+            --psi-ms psi-ms.obo \
+            --date "$(date -u +'%d:%m:%Y %H:%M')" \
             --report sync-report.md
 
       - name: Validate generated module
@@ -93,6 +98,7 @@ jobs:
         with:
           token: ${{ secrets.PSI_MS_CV_GITHUB_TOKEN }}
           add-paths: |
+            psi-ms.obo
             psi-ms-columns.obo
             .github/repo-rt/psi-ms-column-ids.tsv
           branch: sync/repo-rt-column-models
