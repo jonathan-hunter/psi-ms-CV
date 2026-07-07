@@ -10,13 +10,13 @@
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:oboInOwl="http://www.geneontology.org/formats/oboInOwl#">
     <owl:Ontology rdf:about="http://purl.obolibrary.org/obo/ms.owl">
-        <owl:versionIRI rdf:resource="http://purl.obolibrary.org/obo/ms/4.1.256/ms.owl"/>
+        <owl:versionIRI rdf:resource="http://purl.obolibrary.org/obo/ms/4.1.258/ms.owl"/>
         <oboInOwl:NamespaceIdRule>* MS:$sequence(7,0,9999999)$</oboInOwl:NamespaceIdRule>
         <oboInOwl:NamespaceIdRule>* PEFF:$sequence(7,0,9999999)$</oboInOwl:NamespaceIdRule>
         <oboInOwl:date>11:06:2026 17:15</oboInOwl:date>
         <oboInOwl:default-namespace>MS</oboInOwl:default-namespace>
         <oboInOwl:hasOBOFormatVersion>1.2</oboInOwl:hasOBOFormatVersion>
-        <oboInOwl:saved-by>Douwe Schulte</oboInOwl:saved-by>
+        <oboInOwl:saved-by>Jonathan Hunter</oboInOwl:saved-by>
         <rdfs:comment>For any queries contact psidev-ms-vocab@lists.sourceforge.net</rdfs:comment>
         <rdfs:comment>This work is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) license.</rdfs:comment>
         <rdfs:comment>To view a copy of this license, visit https://creativecommons.org/licenses/by/4.0/ or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.</rdfs:comment>
@@ -39,6 +39,7 @@
         <rdfs:comment>creator: Marius Kallhardt &lt;Marius.Kallhardt &lt;-at-&gt; bdal.de&gt;</rdfs:comment>
         <rdfs:comment>creator: Mathias Walzer &lt;walzer &lt;-at-&gt; ebi.ac.uk&gt;</rdfs:comment>
         <rdfs:comment>creator: Matt Chambers &lt;matt.chambers &lt;-at-&gt; vanderbilt.edu&gt;</rdfs:comment>
+        <rdfs:comment>creator: Michael Witting &lt;witting.michael &lt;-at-&gt; web.de&gt;</rdfs:comment>
         <rdfs:comment>creator: Nils Hoffmann &lt; nils.hoffmann &lt;-at-&gt; cebitec.uni-bielefeld.de&gt;</rdfs:comment>
         <rdfs:comment>creator: Nithu Sara John &lt;nithu &lt;-at-&gt; ebi.ac.uk&gt;</rdfs:comment>
         <rdfs:comment>creator: Pierre-Alain Binz &lt;pierre-alain.binz &lt;-at-&gt; chuv.ch&gt;</rdfs:comment>
@@ -90655,7 +90656,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000001">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by ANPEL Laboratory Technologies Inc.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by ANPEL Laboratory Technologies Inc.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000001</oboInOwl:id>
         <rdfs:label>ANPEL Laboratory Technologies Inc. chromatographic column model</rdfs:label>
@@ -90663,7 +90664,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000001"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by ANPEL Laboratory Technologies Inc.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by ANPEL Laboratory Technologies Inc.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90673,7 +90674,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000002">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Advanced Chromatography Technologies.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Advanced Chromatography Technologies.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000002</oboInOwl:id>
         <rdfs:label>Advanced Chromatography Technologies chromatographic column model</rdfs:label>
@@ -90681,7 +90682,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000002"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Advanced Chromatography Technologies.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Advanced Chromatography Technologies.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90691,7 +90692,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000003">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Advanced Materials Technology.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Advanced Materials Technology.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000003</oboInOwl:id>
         <rdfs:label>Advanced Materials Technology chromatographic column model</rdfs:label>
@@ -90699,7 +90700,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000003"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Advanced Materials Technology.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Advanced Materials Technology.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90709,7 +90710,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000004">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Agilent.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Agilent.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000004</oboInOwl:id>
         <rdfs:label>Agilent chromatographic column model</rdfs:label>
@@ -90717,7 +90718,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000004"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Agilent.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Agilent.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90727,7 +90728,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000005">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Agilent Technologies.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Agilent Technologies.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000005</oboInOwl:id>
         <rdfs:label>Agilent Technologies chromatographic column model</rdfs:label>
@@ -90735,7 +90736,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000005"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Agilent Technologies.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Agilent Technologies.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90745,7 +90746,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000006">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Altmann Analytik.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Altmann Analytik.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000006</oboInOwl:id>
         <rdfs:label>Altmann Analytik chromatographic column model</rdfs:label>
@@ -90753,7 +90754,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000006"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Altmann Analytik.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Altmann Analytik.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90763,7 +90764,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000007">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Analytical Sales &amp; Services.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Analytical Sales &amp; Services.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000007</oboInOwl:id>
         <rdfs:label>Analytical Sales &amp; Services chromatographic column model</rdfs:label>
@@ -90771,7 +90772,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000007"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Analytical Sales &amp; Services.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Analytical Sales &amp; Services.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90781,7 +90782,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000008">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Bischoff.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Bischoff.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000008</oboInOwl:id>
         <rdfs:label>Bischoff chromatographic column model</rdfs:label>
@@ -90789,7 +90790,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000008"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Bischoff.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Bischoff.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90799,7 +90800,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000009">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Bonna-Agela Technologies.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Bonna-Agela Technologies.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000009</oboInOwl:id>
         <rdfs:label>Bonna-Agela Technologies chromatographic column model</rdfs:label>
@@ -90807,7 +90808,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000009"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Bonna-Agela Technologies.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Bonna-Agela Technologies.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90817,7 +90818,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000010">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by ChromaNik Technologies Inc.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by ChromaNik Technologies Inc.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000010</oboInOwl:id>
         <rdfs:label>ChromaNik Technologies Inc. chromatographic column model</rdfs:label>
@@ -90825,7 +90826,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000010"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by ChromaNik Technologies Inc.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by ChromaNik Technologies Inc.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90835,7 +90836,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000011">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Chromatopak.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Chromatopak.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000011</oboInOwl:id>
         <rdfs:label>Chromatopak chromatographic column model</rdfs:label>
@@ -90843,7 +90844,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000011"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Chromatopak.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Chromatopak.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90853,7 +90854,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000012">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Develosil.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Develosil.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000012</oboInOwl:id>
         <rdfs:label>Develosil chromatographic column model</rdfs:label>
@@ -90861,7 +90862,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000012"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Develosil.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Develosil.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90871,7 +90872,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000013">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Dikma Technologies Inc.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Dikma Technologies Inc.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000013</oboInOwl:id>
         <rdfs:label>Dikma Technologies Inc. chromatographic column model</rdfs:label>
@@ -90879,7 +90880,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000013"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Dikma Technologies Inc.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Dikma Technologies Inc.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90889,7 +90890,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000014">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Dr. Maisch.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Dr. Maisch.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000014</oboInOwl:id>
         <rdfs:label>Dr. Maisch chromatographic column model</rdfs:label>
@@ -90897,7 +90898,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000014"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Dr. Maisch.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Dr. Maisch.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90907,7 +90908,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000015">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by ES Industries.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by ES Industries.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000015</oboInOwl:id>
         <rdfs:label>ES Industries chromatographic column model</rdfs:label>
@@ -90915,7 +90916,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000015"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by ES Industries.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by ES Industries.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90925,7 +90926,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000016">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Eprogen / Promigen Life Sciences.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Eprogen / Promigen Life Sciences.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000016</oboInOwl:id>
         <rdfs:label>Eprogen / Promigen Life Sciences chromatographic column model</rdfs:label>
@@ -90933,7 +90934,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000016"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Eprogen / Promigen Life Sciences.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Eprogen / Promigen Life Sciences.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90943,7 +90944,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000017">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by FUJIFILM Wako Pure Chemical Corporation.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by FUJIFILM Wako Pure Chemical Corporation.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000017</oboInOwl:id>
         <rdfs:label>FUJIFILM Wako Pure Chemical Corporation chromatographic column model</rdfs:label>
@@ -90951,7 +90952,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000017"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by FUJIFILM Wako Pure Chemical Corporation.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by FUJIFILM Wako Pure Chemical Corporation.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90961,7 +90962,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000018">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Fortis Technologies.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Fortis Technologies.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000018</oboInOwl:id>
         <rdfs:label>Fortis Technologies chromatographic column model</rdfs:label>
@@ -90969,7 +90970,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000018"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Fortis Technologies.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Fortis Technologies.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90979,7 +90980,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000019">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by GL Sciences.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by GL Sciences.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000019</oboInOwl:id>
         <rdfs:label>GL Sciences chromatographic column model</rdfs:label>
@@ -90987,7 +90988,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000019"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by GL Sciences.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by GL Sciences.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -90997,7 +90998,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000020">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Genius Technologies.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Genius Technologies.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000020</oboInOwl:id>
         <rdfs:label>Genius Technologies chromatographic column model</rdfs:label>
@@ -91005,7 +91006,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000020"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Genius Technologies.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Genius Technologies.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91015,7 +91016,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000021">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Grace.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Grace.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000021</oboInOwl:id>
         <rdfs:label>Grace chromatographic column model</rdfs:label>
@@ -91023,7 +91024,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000021"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Grace.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Grace.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91033,7 +91034,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000022">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Grace Alltech.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Grace Alltech.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000022</oboInOwl:id>
         <rdfs:label>Grace Alltech chromatographic column model</rdfs:label>
@@ -91041,7 +91042,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000022"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Grace Alltech.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Grace Alltech.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91051,7 +91052,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000023">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Grace Grom.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Grace Grom.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000023</oboInOwl:id>
         <rdfs:label>Grace Grom chromatographic column model</rdfs:label>
@@ -91059,7 +91060,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000023"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Grace Grom.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Grace Grom.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91069,7 +91070,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000024">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Grace Jones.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Grace Jones.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000024</oboInOwl:id>
         <rdfs:label>Grace Jones chromatographic column model</rdfs:label>
@@ -91077,7 +91078,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000024"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Grace Jones.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Grace Jones.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91087,7 +91088,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000025">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Grace Vydac.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Grace Vydac.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000025</oboInOwl:id>
         <rdfs:label>Grace Vydac chromatographic column model</rdfs:label>
@@ -91095,7 +91096,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000025"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Grace Vydac.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Grace Vydac.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91105,7 +91106,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000026">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by HILICON.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by HILICON.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000026</oboInOwl:id>
         <rdfs:label>HILICON chromatographic column model</rdfs:label>
@@ -91113,7 +91114,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000026"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by HILICON.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by HILICON.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91123,7 +91124,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000027">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Hamilton Company.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Hamilton Company.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000027</oboInOwl:id>
         <rdfs:label>Hamilton Company chromatographic column model</rdfs:label>
@@ -91131,7 +91132,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000027"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Hamilton Company.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Hamilton Company.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91141,7 +91142,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000028">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Hichrom.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Hichrom.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000028</oboInOwl:id>
         <rdfs:label>Hichrom chromatographic column model</rdfs:label>
@@ -91149,7 +91150,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000028"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Hichrom.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Hichrom.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91159,7 +91160,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000029">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Higgins Analytical.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Higgins Analytical.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000029</oboInOwl:id>
         <rdfs:label>Higgins Analytical chromatographic column model</rdfs:label>
@@ -91167,7 +91168,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000029"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Higgins Analytical.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Higgins Analytical.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91177,7 +91178,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000030">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Hitachi High-Tech.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Hitachi High-Tech.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000030</oboInOwl:id>
         <rdfs:label>Hitachi High-Tech chromatographic column model</rdfs:label>
@@ -91185,7 +91186,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000030"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Hitachi High-Tech.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Hitachi High-Tech.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91195,7 +91196,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000031">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Imtakt.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Imtakt.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000031</oboInOwl:id>
         <rdfs:label>Imtakt chromatographic column model</rdfs:label>
@@ -91203,7 +91204,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000031"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Imtakt.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Imtakt.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91213,7 +91214,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000032">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Interchim Technology.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Interchim Technology.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000032</oboInOwl:id>
         <rdfs:label>Interchim Technology chromatographic column model</rdfs:label>
@@ -91221,7 +91222,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000032"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Interchim Technology.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Interchim Technology.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91231,7 +91232,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000033">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by KYA TECH Corporation.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by KYA TECH Corporation.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000033</oboInOwl:id>
         <rdfs:label>KYA TECH Corporation chromatographic column model</rdfs:label>
@@ -91239,7 +91240,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000033"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by KYA TECH Corporation.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by KYA TECH Corporation.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91249,7 +91250,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000034">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Knauer.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Knauer.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000034</oboInOwl:id>
         <rdfs:label>Knauer chromatographic column model</rdfs:label>
@@ -91257,7 +91258,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000034"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Knauer.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Knauer.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91267,7 +91268,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000035">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Macherey-Nagel.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Macherey-Nagel.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000035</oboInOwl:id>
         <rdfs:label>Macherey-Nagel chromatographic column model</rdfs:label>
@@ -91275,7 +91276,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000035"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Macherey-Nagel.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Macherey-Nagel.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91285,7 +91286,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000036">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Merck.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Merck.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000036</oboInOwl:id>
         <rdfs:label>Merck chromatographic column model</rdfs:label>
@@ -91293,7 +91294,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000036"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Merck.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Merck.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91303,7 +91304,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000037">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Merck SeQuant.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Merck SeQuant.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000037</oboInOwl:id>
         <rdfs:label>Merck SeQuant chromatographic column model</rdfs:label>
@@ -91311,7 +91312,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000037"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Merck SeQuant.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Merck SeQuant.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91321,7 +91322,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000038">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Merck Supelco.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Merck Supelco.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000038</oboInOwl:id>
         <rdfs:label>Merck Supelco chromatographic column model</rdfs:label>
@@ -91329,7 +91330,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000038"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Merck Supelco.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Merck Supelco.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91339,7 +91340,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000039">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by MicroSolv Technology Corporation.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by MicroSolv Technology Corporation.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000039</oboInOwl:id>
         <rdfs:label>MicroSolv Technology Corporation chromatographic column model</rdfs:label>
@@ -91347,7 +91348,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000039"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by MicroSolv Technology Corporation.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by MicroSolv Technology Corporation.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91357,7 +91358,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000040">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Nacalai Tesque.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Nacalai Tesque.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000040</oboInOwl:id>
         <rdfs:label>Nacalai Tesque chromatographic column model</rdfs:label>
@@ -91365,7 +91366,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000040"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Nacalai Tesque.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Nacalai Tesque.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91375,7 +91376,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000041">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Nanghavi Chromatography Solutions.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Nanghavi Chromatography Solutions.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000041</oboInOwl:id>
         <rdfs:label>Nanghavi Chromatography Solutions chromatographic column model</rdfs:label>
@@ -91383,7 +91384,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000041"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Nanghavi Chromatography Solutions.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Nanghavi Chromatography Solutions.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91393,7 +91394,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000042">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Nanologica.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Nanologica.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000042</oboInOwl:id>
         <rdfs:label>Nanologica chromatographic column model</rdfs:label>
@@ -91401,7 +91402,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000042"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Nanologica.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Nanologica.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91411,7 +91412,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000043">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Nomura Chemical.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Nomura Chemical.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000043</oboInOwl:id>
         <rdfs:label>Nomura Chemical chromatographic column model</rdfs:label>
@@ -91419,7 +91420,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000043"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Nomura Chemical.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Nomura Chemical.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91429,7 +91430,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000044">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Nouryon-Kromasil.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Nouryon-Kromasil.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000044</oboInOwl:id>
         <rdfs:label>Nouryon-Kromasil chromatographic column model</rdfs:label>
@@ -91437,7 +91438,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000044"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Nouryon-Kromasil.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Nouryon-Kromasil.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91447,7 +91448,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000045">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Orochem.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Orochem.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000045</oboInOwl:id>
         <rdfs:label>Orochem chromatographic column model</rdfs:label>
@@ -91455,7 +91456,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000045"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Orochem.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Orochem.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91465,7 +91466,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000046">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Osaka Soda (Shiseido).</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Osaka Soda (Shiseido).</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000046</oboInOwl:id>
         <rdfs:label>Osaka Soda (Shiseido) chromatographic column model</rdfs:label>
@@ -91473,7 +91474,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000046"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Osaka Soda (Shiseido).</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Osaka Soda (Shiseido).</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91483,7 +91484,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000047">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Phase Analytical Technology, LLC.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Phase Analytical Technology, LLC.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000047</oboInOwl:id>
         <rdfs:label>Phase Analytical Technology, LLC chromatographic column model</rdfs:label>
@@ -91491,7 +91492,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000047"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Phase Analytical Technology, LLC.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Phase Analytical Technology, LLC.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91501,7 +91502,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000048">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Phenomenex.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Phenomenex.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000048</oboInOwl:id>
         <rdfs:label>Phenomenex chromatographic column model</rdfs:label>
@@ -91509,7 +91510,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000048"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Phenomenex.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Phenomenex.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91519,7 +91520,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000049">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Restek.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Restek.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000049</oboInOwl:id>
         <rdfs:label>Restek chromatographic column model</rdfs:label>
@@ -91527,7 +91528,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000049"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Restek.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Restek.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91537,7 +91538,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000050">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by SEPSERV.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by SEPSERV.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000050</oboInOwl:id>
         <rdfs:label>SEPSERV chromatographic column model</rdfs:label>
@@ -91545,7 +91546,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000050"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by SEPSERV.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by SEPSERV.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91555,7 +91556,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000051">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by SIELC Technologies.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by SIELC Technologies.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000051</oboInOwl:id>
         <rdfs:label>SIELC Technologies chromatographic column model</rdfs:label>
@@ -91563,7 +91564,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000051"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by SIELC Technologies.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by SIELC Technologies.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91573,7 +91574,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000052">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Sepax Technologies.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Sepax Technologies.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000052</oboInOwl:id>
         <rdfs:label>Sepax Technologies chromatographic column model</rdfs:label>
@@ -91581,7 +91582,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000052"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Sepax Technologies.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Sepax Technologies.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91591,7 +91592,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000053">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Shimadzu.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Shimadzu.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000053</oboInOwl:id>
         <rdfs:label>Shimadzu chromatographic column model</rdfs:label>
@@ -91599,7 +91600,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000053"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Shimadzu.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Shimadzu.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91609,7 +91610,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000054">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Shodex.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Shodex.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000054</oboInOwl:id>
         <rdfs:label>Shodex chromatographic column model</rdfs:label>
@@ -91617,7 +91618,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000054"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Shodex.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Shodex.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91627,7 +91628,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000055">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Showa Denko.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Showa Denko.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000055</oboInOwl:id>
         <rdfs:label>Showa Denko chromatographic column model</rdfs:label>
@@ -91635,7 +91636,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000055"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Showa Denko.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Showa Denko.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91645,7 +91646,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000056">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Thermo Scientific.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Thermo Scientific.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000056</oboInOwl:id>
         <rdfs:label>Thermo Scientific chromatographic column model</rdfs:label>
@@ -91653,7 +91654,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000056"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Thermo Scientific.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Thermo Scientific.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91663,7 +91664,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000057">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Tosoh Bioscience.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Tosoh Bioscience.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000057</oboInOwl:id>
         <rdfs:label>Tosoh Bioscience chromatographic column model</rdfs:label>
@@ -91671,7 +91672,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000057"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Tosoh Bioscience.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Tosoh Bioscience.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91681,7 +91682,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000058">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by United Chemical Technologies.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by United Chemical Technologies.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000058</oboInOwl:id>
         <rdfs:label>United Chemical Technologies chromatographic column model</rdfs:label>
@@ -91689,7 +91690,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000058"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by United Chemical Technologies.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by United Chemical Technologies.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91699,7 +91700,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000059">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by VDS Optilab.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by VDS Optilab.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000059</oboInOwl:id>
         <rdfs:label>VDS Optilab chromatographic column model</rdfs:label>
@@ -91707,7 +91708,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000059"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by VDS Optilab.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by VDS Optilab.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91717,7 +91718,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000060">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Waters.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Waters.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000060</oboInOwl:id>
         <rdfs:label>Waters chromatographic column model</rdfs:label>
@@ -91725,7 +91726,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000060"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Waters.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Waters.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91735,7 +91736,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000061">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Welch Materials.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Welch Materials.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000061</oboInOwl:id>
         <rdfs:label>Welch Materials chromatographic column model</rdfs:label>
@@ -91743,7 +91744,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000061"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Welch Materials.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Welch Materials.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91753,7 +91754,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000062">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Wesley Technologies Inc.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Wesley Technologies Inc.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000062</oboInOwl:id>
         <rdfs:label>Wesley Technologies Inc. chromatographic column model</rdfs:label>
@@ -91761,7 +91762,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000062"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Wesley Technologies Inc.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Wesley Technologies Inc.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91771,7 +91772,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000063">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by YMC.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by YMC.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000063</oboInOwl:id>
         <rdfs:label>YMC chromatographic column model</rdfs:label>
@@ -91779,7 +91780,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000063"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by YMC.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by YMC.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91789,7 +91790,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000064">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by ZirChrom.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by ZirChrom.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000064</oboInOwl:id>
         <rdfs:label>ZirChrom chromatographic column model</rdfs:label>
@@ -91797,7 +91798,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000064"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by ZirChrom.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by ZirChrom.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -91807,7 +91808,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5000065">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000000"/>
-        <obo:IAO_0000115>Chromatographic column models manufactured by Zodiac Life Sciences.</obo:IAO_0000115>
+        <obo:IAO_0000115>Chromatographic column model manufactured by Zodiac Life Sciences.</obo:IAO_0000115>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5000065</oboInOwl:id>
         <rdfs:label>Zodiac Life Sciences chromatographic column model</rdfs:label>
@@ -91815,7 +91816,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5000065"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>Chromatographic column models manufactured by Zodiac Life Sciences.</owl:annotatedTarget>
+        <owl:annotatedTarget>Chromatographic column model manufactured by Zodiac Life Sciences.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
@@ -94395,13 +94396,7 @@
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_5001107">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_1003921"/>
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_5000056"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/ms-columns#has_separation_mode"/>
-                <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/MS_1003584"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <obo:IAO_0000115>A HILIC liquid chromatographic column model manufactured by Thermo Scientific.</obo:IAO_0000115>
+        <obo:IAO_0000115>A liquid chromatographic column model manufactured by Thermo Scientific.</obo:IAO_0000115>
         <obo:usp_designation_>L68</obo:usp_designation_>
         <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
         <oboInOwl:id>MS:5001107</oboInOwl:id>
@@ -94410,7 +94405,7 @@
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_5001107"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
-        <owl:annotatedTarget>A HILIC liquid chromatographic column model manufactured by Thermo Scientific.</owl:annotatedTarget>
+        <owl:annotatedTarget>A liquid chromatographic column model manufactured by Thermo Scientific.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
     </owl:Axiom>
     
