@@ -9,8 +9,8 @@ holding the whole column-model branch in the MS:5000000 namespace:
         MS:5001000+  <product>                                (one per model)
           is_a <vendor> chromatographic column model
           is_a MS:1003921 ! liquid chromatographic column
-          relationship: has_separation_mode ...               (when known)
-          property_value: usp_designation: "..." xsd:string   (per USP code)
+          relationship: MSREL:has_separation_mode ...           (when known)
+          property_value: MSREL:usp_designation "..." xsd:string (per USP code)
 
 This generator does not correct or infer data — it only
 verifies the input is valid UTF-8 and well-formed (correct field counts) and aborts
@@ -20,8 +20,8 @@ emitted only when every row agrees — any within-model disagreement emits nothi
 that field and is reported for upstream fixing (no majority guess is made).
 
 References to MS:1000857, MS:1003920, MS:1003921 and the MS:1002271 technique
-terms are external to this module and resolve against psi-ms.obo, with which it is
-merged (`robot merge`) in the update-owl.yaml build to produce the published OWL.
+terms are external to this module and resolve against psi-ms-core.obo. ROBOT merges
+the two source components to produce the versioned psi-ms.obo and psi-ms.owl releases.
 
 IDs are stable across runs: existing terms keep their id (read back from the
 output file), and only genuinely new vendors/models get the next free id. This
@@ -38,16 +38,12 @@ the run, and a new label carrying a stale id is reported as a likely rename.
 --reset-ids ignores the existing OBO and assigns clean sequential ids (used once to
 mint the initial baseline).
 
-psi-ms.obo and psi-ms-columns.obo share a single data-version (psi-ms.obo is the
-canonical source; the module mirrors it). When the regenerated term body differs from
-the committed module, the shared version is bumped one patch level and written to BOTH
-files (psi-ms.obo via --psi-ms), so a columns-only sync bumps psi-ms.obo and thereby
-cuts a release through the existing tag trigger. An unchanged catalog keeps the version
-and reproduces both files byte-for-byte (no PR).
+This component is versioned by Git, not by an OBO data-version. The repository VERSION
+file supplies the version only when ROBOT builds the merged release artefacts.
 
 Usage:
     python scripts/chrom_columns/generate_psi_ms_columns.py \\
-        --input column_database.tsv --psi-ms psi-ms.obo --date "$(date +'%d:%m:%Y %H:%M')"
+        --input column_database.tsv --output psi-ms-columns.obo
 """
 
 import argparse
@@ -62,9 +58,6 @@ import pandas as pd
 OUTPUT_DEFAULT = "psi-ms-columns.obo"
 INPUT_DEFAULT = ".jeh-local/column_database_fixed.tsv"
 MAPPING_DEFAULT = ".github/repo-rt/psi-ms-column-ids.tsv"
-# psi-ms.obo holds the single canonical data-version that both files share; the
-# columns module mirrors it and a column change bumps it there too (see main).
-PSI_MS_DEFAULT = "psi-ms.obo"
 
 # ID bands within the MS:5000000 namespace (kept separate so the file stays
 # grouped scaffold-then-leaves even as new terms are appended over time).
@@ -76,29 +69,25 @@ LEAF_BAND = (5001000, 5999999)
 # is treated as a truncated/corrupt download and aborts (guarded in build_columns_obo).
 MIN_RETAIN_FRACTION = 0.5
 
-# Cross-file targets, defined in psi-ms.obo.
+# Cross-file targets, defined in psi-ms-core.obo.
 RUN_ATTRIBUTE = "MS:1000857"
 CHROM_COLUMN = "MS:1003920"
 LIQUID_COLUMN = "MS:1003921"
 
-def build_header(data_version):
-    return f"""\
+def build_header():
+    return """\
 format-version: 1.2
-data-version: {data_version}
 saved-by: Jonathan Hunter
 default-namespace: MS
-ontology: ms-columns
+idspace: MSREL http://purl.obolibrary.org/obo/ms#
 remark: Model-level chromatographic column terms (MS:5000000 namespace), generated from the repo-rt column database.
-remark: Merged with psi-ms.obo (via robot merge in update-owl.yaml) to build the published OWL.
+remark: Merged with psi-ms-core.obo by ROBOT to build the PSI-MS release files.
 remark: coverage of namespace-id: MS:$sequence(7,5000000,5999999)$: Chromatographic column models
+ontology: http://purl.obolibrary.org/obo/ms/components/psi-ms-columns.owl
 
 [Typedef]
-id: has_separation_mode
+id: MSREL:has_separation_mode
 name: has_separation_mode
-
-[Typedef]
-id: usp_designation
-name: usp_designation
 """
 
 # Separation-mode key -> (technique term id, label, definition adjective).
@@ -357,7 +346,7 @@ def parent_stanza():
         'def: "A specific chromatographic column product, identified by its '
         'manufacturer and product name." [PSI:MS]',
         f"is_a: {RUN_ATTRIBUTE} ! run attribute",
-        f"relationship: part_of {CHROM_COLUMN} ! chromatographic column",
+        f"relationship: MSREL:part_of {CHROM_COLUMN} ! chromatographic column",
     ]
     return "\n".join(lines)
 
@@ -385,9 +374,9 @@ def leaf_stanza(leaf_id, vendor, vendor_id, label, mode, usp_literals):
     ]
     if mode:
         mode_id, mode_label, _ = MODE_INFO[mode]
-        lines.append(f"relationship: has_separation_mode {mode_id} ! {mode_label}")
+        lines.append(f"relationship: MSREL:has_separation_mode {mode_id} ! {mode_label}")
     for code in usp_literals:
-        lines.append(f'property_value: usp_designation: "{escape_def(code)}" xsd:string')
+        lines.append(f'property_value: MSREL:usp_designation "{escape_def(code)}" xsd:string')
     return "\n".join(lines)
 
 
@@ -406,77 +395,6 @@ def read_existing_ids(path):
             ids[line[len("name: "):].strip()] = current
             current = None
     return ids
-
-
-def bump_patch(version):
-    """Increment the trailing numeric component of a dotted version (4.1.258 -> 4.1.259),
-    preserving its zero-padded width so a padded baseline keeps padding (1.0.009 -> 1.0.010)."""
-    parts = version.split(".")
-    parts[-1] = str(int(parts[-1]) + 1).zfill(len(parts[-1]))
-    return ".".join(parts)
-
-
-def version_key(version):
-    """Ordering key for a dotted numeric version, so 4.1.9 sorts below 4.1.10."""
-    return tuple(int(n) for n in re.findall(r"\d+", version))
-
-
-def read_data_version(path):
-    """Return the data-version string from an OBO file's header, or None if absent."""
-    for line in open(path, encoding="utf-8"):
-        if line.startswith("[Term]") or line.startswith("[Typedef]"):
-            break  # past the header
-        m = re.match(r"data-version:\s*(\S+)", line)
-        if m:
-            return m.group(1)
-    return None
-
-
-def set_psi_ms_version(path, version, date=None):
-    """Rewrite psi-ms.obo's data-version (and, when given, date) header line in place,
-    leaving the rest of the file byte-for-byte unchanged. Called only when a column
-    change bumps the shared version, so the sync PR also bumps psi-ms.obo and the
-    existing tag/release trigger fires. date is supplied by the caller (the workflow's
-    clock) so the generator itself stays deterministic; omitted -> date left as is."""
-    text = open(path, encoding="utf-8").read()
-    text, n = re.subn(r"(?m)^data-version:.*$", f"data-version: {version}", text, count=1)
-    if not n:
-        raise ValueError(f"{path} has no data-version header line to update")
-    if date is not None:
-        text = re.sub(r"(?m)^date:.*$", f"date: {date}", text, count=1)
-    open(path, "w", encoding="utf-8").write(text)
-
-
-def resolve_shared_version(psi_ms_version, prior_version, prior_body, body_block):
-    """Resolve psi-ms-columns.obo's data-version under the single-shared-version scheme
-    and say whether psi-ms.obo must be bumped to match. Returns (version, psi_ms_bumped):
-
-      - no prior module (--reset-ids / first run): adopt psi-ms's version, no bump;
-      - unchanged term body: keep the module's own prior version, no bump (an unchanged
-        catalog still reproduces the file byte-for-byte and opens no PR);
-      - changed term body: bump one patch above whichever of psi-ms / the module is
-        currently highest, and flag that psi-ms.obo must be rewritten to that value too
-        (this is what makes a columns-only sync bump the shared version and cut a release).
-    """
-    if prior_version is None or prior_body is None:
-        return psi_ms_version, False
-    if body_block == prior_body:
-        return prior_version, False
-    base = max(psi_ms_version, prior_version, key=version_key)
-    return bump_patch(base), True
-
-
-def read_prior_module(path):
-    """Return (data_version, body) of a prior module, for the version-bump decision.
-
-    body is the stanza text from the first [Term] to EOF (the header, which carries
-    the version, is excluded); (None, None) when there is no prior module."""
-    if not os.path.exists(path):
-        return None, None
-    text = open(path, encoding="utf-8").read()
-    m = re.search(r"^data-version:\s*(.+)$", text, re.M)
-    idx = text.find("[Term]")
-    return (m.group(1).strip() if m else None), (text[idx:] if idx != -1 else None)
 
 
 def assign_ids(names, existing, band):
@@ -551,14 +469,9 @@ def build_mapping_tsv(models, labels, leaf_ids):
     return "\n".join(lines) + "\n"
 
 
-def build_columns_obo(models, existing, psi_ms_version, prior_version=None, prior_body=None):
+def build_columns_obo(models, existing):
     """Return (obo_text, mapping_text, report). Terms are emitted in id order so the
-    file stays sorted and stable; report holds the run summary for logs and main().
-
-    The data-version is the single shared version (see resolve_shared_version): both
-    files carry psi-ms.obo's version, and a changed term body bumps it. report carries
-    that resolved version and report["psi_ms_bumped"] (whether main must rewrite
-    psi-ms.obo to it) alongside the data-quality summary."""
+    file stays sorted and stable; report holds the run summary for logs and main()."""
     if not models:
         raise ValueError("catalog produced 0 column models; refusing to write an empty module")
     prior_leaves = sum(1 for i in existing.values()
@@ -617,12 +530,7 @@ def build_columns_obo(models, existing, psi_ms_version, prior_version=None, prio
 
     stanzas.sort(key=lambda pair: pair[0])
     body_block = "\n\n".join(text for _, text in stanzas) + "\n"
-    version, psi_ms_bumped = resolve_shared_version(
-        psi_ms_version, prior_version, prior_body, body_block
-    )
-    report["version"] = version
-    report["psi_ms_bumped"] = psi_ms_bumped
-    obo_text = build_header(version) + "\n" + body_block
+    obo_text = build_header() + "\n" + body_block
     return obo_text, build_mapping_tsv(models, labels, leaf_ids), report
 
 
@@ -664,38 +572,19 @@ def main():
     parser.add_argument("--output", default=OUTPUT_DEFAULT, help="OBO module to write")
     parser.add_argument("--mapping", default=MAPPING_DEFAULT,
                         help="company/column -> psi_ms_id TSV (repo-rt back-prop contract)")
-    parser.add_argument("--psi-ms", default=PSI_MS_DEFAULT,
-                        help="psi-ms.obo: canonical shared data-version source; its "
-                             "data-version (and --date) is bumped when the column body changes")
-    parser.add_argument("--date", help="date stamp (DD:MM:YYYY HH:MM) written to psi-ms.obo "
-                        "on a version bump; the workflow supplies its clock so the generator "
-                        "stays deterministic. Omitted -> psi-ms.obo's date is left unchanged")
     parser.add_argument("--reset-ids", action="store_true",
                         help="ignore existing ids in --output and assign clean sequential ids")
     parser.add_argument("--report", help="write a Markdown data-quality summary to this path")
     args = parser.parse_args()
 
-    psi_ms_version = read_data_version(args.psi_ms)
-    if psi_ms_version is None:
-        raise SystemExit(f"no data-version header found in {args.psi_ms}")
-
     models = load_models(args.input)
     if args.reset_ids:
-        existing, prior_version, prior_body = {}, None, None
+        existing = {}
     else:
         existing = read_existing_ids(args.output)  # read before we overwrite it
-        prior_version, prior_body = read_prior_module(args.output)
-    obo_text, mapping_text, report = build_columns_obo(
-        models, existing, psi_ms_version, prior_version, prior_body
-    )
+    obo_text, mapping_text, report = build_columns_obo(models, existing)
     open(args.output, "w", encoding="utf-8").write(obo_text)
-    print(f"wrote {args.output} (data-version {report['version']})")
-
-    # A changed term body bumps the shared version; propagate it to psi-ms.obo so the
-    # sync PR bumps both files and the existing tag/release trigger fires.
-    if report["psi_ms_bumped"]:
-        set_psi_ms_version(args.psi_ms, report["version"], args.date)
-        print(f"bumped {args.psi_ms} data-version -> {report['version']}")
+    print(f"wrote {args.output}")
 
     if os.path.dirname(args.mapping):
         os.makedirs(os.path.dirname(args.mapping), exist_ok=True)
