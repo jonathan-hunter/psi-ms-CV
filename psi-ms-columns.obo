@@ -2,7 +2,8 @@ format-version: 1.2
 saved-by: Jonathan Hunter
 default-namespace: MS
 idspace: MSREL http://purl.obolibrary.org/obo/ms#
-remark: Model-level chromatographic column terms (MS:5000000 namespace), generated from the repo-rt column database.
+remark: Model-level chromatographic column terms (MS:5000000 namespace), generated from the RepoRT column database, https://github.com/michaelwitting/RepoRT.
+remark: See Kretschmer F, Harrieder EM, Hoffmann MA, Boecker S, Witting M. RepoRT: a comprehensive repository for small molecule retention times. Nat Methods. 2024;21(2):153-155. PMID:38191934, doi:10.1038/s41592-023-02143-z
 remark: Merged with psi-ms-core.obo by ROBOT to build the PSI-MS release files.
 remark: coverage of namespace-id: MS:$sequence(7,5000000,5999999)$: Chromatographic column models
 ontology: http://purl.obolibrary.org/obo/ms/components/psi-ms-columns.owl
@@ -10,6 +11,12 @@ ontology: http://purl.obolibrary.org/obo/ms/components/psi-ms-columns.owl
 [Typedef]
 id: MSREL:has_separation_mode
 name: has_separation_mode
+
+[Typedef]
+id: MSREL:usp_designation
+name: usp_designation
+def: "The United States Pharmacopeia packing classification code, such as L1, assigned to a chromatographic column's stationary phase." []
+is_metadata_tag: true
 
 [Term]
 id: MS:5000000

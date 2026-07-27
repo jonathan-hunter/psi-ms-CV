@@ -24,16 +24,14 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - name: Download ROBOT 1.9.10
-        run: curl -fsSL --retry 3 -o robot.jar https://github.com/ontodev/robot/releases/download/v1.9.10/robot.jar
-      - name: Build merged OBO and OWL releases
+      - name: Download ROBOT
         run: |
-          make ROBOT="java -Xmx6G -jar robot.jar" release
-          CV_VERSION=$(tr -d '[:space:]' < VERSION)
-          grep -Fx "data-version: ${CV_VERSION}" psi-ms.obo
-          grep -F "http://purl.obolibrary.org/obo/ms/${CV_VERSION}/ms.owl" psi-ms.owl
-          ! grep -F "components/psi-ms-" psi-ms.owl
-          ! grep -F "http://purl.obolibrary.org/obo/http://" psi-ms.owl
+          curl -fsSL --retry 3 -o robot.jar \
+            "https://github.com/ontodev/robot/releases/download/v$(make -s print-robot-version)/robot.jar"
+      - name: Build merged OBO and OWL releases
+        # `verify` holds the same assertions the PR build check runs, so the committed
+        # artefacts are held to the contract already proven before merge.
+        run: make ROBOT="java -Xmx6G -jar robot.jar" release verify
       - name: Create pull request
         id: cpr
         uses: peter-evans/create-pull-request@v6
@@ -50,13 +48,13 @@ jobs:
           title: Update PSI-MS release files
           body: ROBOT-generated `psi-ms.obo` and `psi-ms.owl` from the two source components and `VERSION`.
       - name: Approve pull request
-        if: (steps.cpr.outputs.pull-request-operation == 'created' ||	steps.cpr.outputs.pull-request-operation == 'updated')
+        if: (steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated')
         uses: juliangruber/approve-pull-request-action@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           number: ${{ steps.cpr.outputs.pull-request-number }}
       - name: Merge pull request
-        if: (steps.cpr.outputs.pull-request-operation == 'created' ||	steps.cpr.outputs.pull-request-operation == 'updated')
+        if: (steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated')
         uses: peter-evans/enable-pull-request-automerge@v3
         with:
           token: ${{ secrets.PSI_MS_CV_GITHUB_TOKEN }}

@@ -17,7 +17,7 @@ The ontology is maintained as two OBO source components and released in OBO and 
 ROBOT performs the merge, assigns the release ontology/version IRIs, writes `psi-ms.owl`, and converts that same merged ontology to `psi-ms.obo`.
 
 ```sh
-make ROBOT="java -jar /path/to/robot.jar" release
+make ROBOT="java -jar /path/to/robot.jar" release verify
 ```
 
 Do not edit either release file directly.

@@ -218,5 +218,6 @@ def test_integration_backslash_name_escaped(tmp_path):
     out.write_text(obo, encoding="utf-8")
     fastobo.load(str(out))                                   # no fold / no crash
     assert "name: C18\\\\" in obo
-    # the def clause survived (one per term: parent + vendor + leaf)
-    assert obo.count('def: "') == 3
+    # the def clause survived (one per term: parent + vendor + leaf); counted past the
+    # header so typedef definitions there do not skew it
+    assert obo.split("[Term]", 1)[1].count('def: "') == 3

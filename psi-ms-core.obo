@@ -33,6 +33,7 @@ remark: creator: Jannick Kappelmann <jannick.kappelmann <-at-> gmail.com>
 remark: creator: Michael Witting <witting.michael <-at-> web.de> 
 remark: publisher: HUPO Proteomics Standards Initiative Mass Spectrometry Standards Working Group and HUPO Proteomics Standards Initiative Proteomics Informatics Working Group
 remark: When appropriate the definition and synonyms of a term are reported exactly as in the chapter 12 of IUPAC orange book. See http://www.iupac.org/projects/2003/2003-056-2-500.html and http://mass-spec.lsu.edu/msterms/index.php/Main_Page
+remark: The chromatographic column models (MS:5000000) are derived from the RepoRT column database, https://github.com/michaelwitting/RepoRT. See Kretschmer F, Harrieder EM, Hoffmann MA, Boecker S, Witting M. RepoRT: a comprehensive repository for small molecule retention times. Nat Methods. 2024;21(2):153-155. PMID:38191934, doi:10.1038/s41592-023-02143-z
 remark: For any queries contact psidev-ms-vocab@lists.sourceforge.net
 remark: URL: http://purl.obolibrary.org/obo/ms/psi-ms.obo
 remark: This work is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) license.

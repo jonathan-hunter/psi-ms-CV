@@ -64,6 +64,18 @@ jobs:
           python scripts/check_sorted.py psi-ms-columns.obo
           python scripts/chrom_columns/check_no_duplicate_ids.py psi-ms-columns.obo
           python scripts/chrom_columns/check_column_mapping.py .github/repo-rt/psi-ms-column-ids.tsv psi-ms-columns.obo
+          python scripts/check_components_disjoint.py psi-ms-core.obo psi-ms-columns.obo
+
+      - name: Bump VERSION when the module changed
+        # check-version.yml requires VERSION > base on any PR touching a component, so
+        # a sync PR that only rewrites psi-ms-columns.obo would sit red until a human
+        # committed the bump. The patch bump is computed against the base checkout, so
+        # a PR left open across an unrelated release needs a rebase (the next weekly
+        # run rebuilds the branch from current master and clears it).
+        run: |
+          git diff --quiet -- psi-ms-columns.obo && exit 0
+          awk -F. -v OFS=. '{$NF = $NF + 1; print}' VERSION > VERSION.tmp && mv VERSION.tmp VERSION
+          echo "VERSION bumped to $(cat VERSION)"
 
       - name: Build PR body
         # Compose the PR body from a static intro plus the generator's data-quality
@@ -78,7 +90,7 @@ jobs:
             echo ''
             echo 'Existing term IDs are preserved (read back from the committed module);'
             echo 'only new vendors/models are appended with fresh IDs. Review the diff before merging.'
-            echo 'If ontology content changed, increment `VERSION` on this PR before merging.'
+            echo 'When the module changed, `VERSION` is patch-bumped in this PR automatically.'
             echo ''
             echo '## Data-quality report'
             echo ''
@@ -96,6 +108,7 @@ jobs:
           add-paths: |
             psi-ms-columns.obo
             .github/repo-rt/psi-ms-column-ids.tsv
+            VERSION
           branch: sync/repo-rt-column-models
           delete-branch: true
           commit-message: |
