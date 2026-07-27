@@ -69,15 +69,21 @@ LEAF_BAND = (5001000, 5999999)
 # is treated as a truncated/corrupt download and aborts (guarded in build_columns_obo).
 MIN_RETAIN_FRACTION = 0.5
 
+# Subset carried by every term in this module, so consumers can include or exclude the
+# whole column branch. Declared here and in psi-ms-core.obo -- core's header is the one
+# guaranteed to reach the release, this one keeps the module valid standalone.
+SUBSET = "MSSUB:columns"
+
 # Cross-file targets, defined in psi-ms-core.obo.
 RUN_ATTRIBUTE = "MS:1000857"
 CHROM_COLUMN = "MS:1003920"
 LIQUID_COLUMN = "MS:1003921"
 
 def build_header():
-    return """\
+    return f"""\
 format-version: 1.2
 saved-by: Jonathan Hunter
+subsetdef: {SUBSET} "Chromatographic column models"
 default-namespace: MS
 idspace: MSREL http://purl.obolibrary.org/obo/ms#
 remark: Model-level chromatographic column terms (MS:5000000 namespace), generated from the RepoRT column database, https://github.com/michaelwitting/RepoRT.
@@ -352,6 +358,7 @@ def parent_stanza():
         "name: chromatographic column model",
         'def: "A specific chromatographic column product, identified by its '
         'manufacturer and product name." [PSI:MS]',
+        f"subset: {SUBSET}",
         f"is_a: {RUN_ATTRIBUTE} ! run attribute",
         f"relationship: MSREL:part_of {CHROM_COLUMN} ! chromatographic column",
     ]
@@ -365,6 +372,7 @@ def vendor_stanza(vendor, vendor_id):
         f"id: {vendor_id}",
         f"name: {escape_tag(vendor)} chromatographic column model",
         f'def: "{escape_def(definition)}" [PSI:MS]',
+        f"subset: {SUBSET}",
         f"is_a: {PARENT_ID} ! chromatographic column model",
     ]
     return "\n".join(lines)
@@ -376,6 +384,7 @@ def leaf_stanza(leaf_id, vendor, vendor_id, label, mode, usp_literals):
         f"id: {leaf_id}",
         f"name: {escape_tag(label)}",
         f'def: "{escape_def(leaf_definition(vendor, mode))}" [PSI:MS]',
+        f"subset: {SUBSET}",
         f"is_a: {vendor_id} ! {vendor} chromatographic column model",
         f"is_a: {LIQUID_COLUMN} ! liquid chromatographic column",
     ]

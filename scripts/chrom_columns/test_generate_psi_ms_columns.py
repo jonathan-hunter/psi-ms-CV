@@ -38,6 +38,18 @@ def test_component_header_has_identity_but_no_release_version():
     assert "data-version:" not in header
 
 
+def test_every_term_carries_the_declared_columns_subset(tmp_path):
+    # A subset: clause on a term whose subsetdef is missing is the defect the imported
+    # UO terms already have, so assert declaration and use together.
+    p = tmp_path / "c.tsv"
+    write_tsv(p, [["Acme", "C18", "RP", "L1"], ["Acme", "C8", "HILIC", ""]])
+    obo, _, _ = gen.build_columns_obo(gen.load_models(str(p)), {})
+    assert f'subsetdef: {gen.SUBSET} "' in obo
+    # parent + vendor + two leaves, each tagged exactly once
+    assert obo.count("[Term]") == 4
+    assert obo.count(f"subset: {gen.SUBSET}") == 4
+
+
 def test_leaf_label_collision_suffix():
     # Model identity is (vendor, column); a model name shared across vendors collides
     # and gets a vendor suffix in its leaf label, a unique one does not.

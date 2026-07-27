@@ -33,6 +33,9 @@ verify:
 	grep -F "$(VERSION_IRI)" psi-ms.owl
 	! grep -F "components/psi-ms-" psi-ms.owl
 	! grep -F "http://purl.obolibrary.org/obo/http://" psi-ms.owl
+	# The column terms carry `subset:`; fail loudly if the round-trip drops the
+	# matching subsetdef rather than shipping an undeclared subset.
+	grep -qE '^subsetdef: (MSSUB:)?columns ' psi-ms.obo
 	python3 scripts/check_aggregate.py psi-ms.obo
 
 .PHONY: print-robot-version
