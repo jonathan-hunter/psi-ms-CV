@@ -1,8 +1,12 @@
 name: "Update OWL"
 
+# Fires on the built psi-ms.obo, not its sources -- a source push would convert the
+# pre-splice file.
 on:
   push:
     branches: [master]
+    paths:
+      - "psi-ms.obo"
 
 jobs:
   generate-owl:
@@ -49,13 +53,13 @@ jobs:
           title: Update OWL file
           body: This automated PR updates the OWL file corresponding to the OBO file
       - name: Approve pull request
-        if: (steps.cpr.outputs.pull-request-operation == 'created' ||	steps.cpr.outputs.pull-request-operation == 'updated')
+        if: (steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated')
         uses: juliangruber/approve-pull-request-action@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           number: ${{ steps.cpr.outputs.pull-request-number }}
       - name: Merge pull request
-        if: (steps.cpr.outputs.pull-request-operation == 'created' ||	steps.cpr.outputs.pull-request-operation == 'updated')
+        if: (steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated')
         uses: peter-evans/enable-pull-request-automerge@v3
         with:
           token: ${{ secrets.PSI_MS_CV_GITHUB_TOKEN }}
