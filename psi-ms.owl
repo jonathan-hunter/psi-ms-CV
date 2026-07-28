@@ -81364,6 +81364,24 @@
     
 
 
+    <!-- http://purl.obolibrary.org/obo/MS_1004012 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_1004012">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/MS_1001456"/>
+        <obo:IAO_0000115>This is a new term to test the flow.</obo:IAO_0000115>
+        <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
+        <oboInOwl:id>MS:1004012</oboInOwl:id>
+        <rdfs:label>new test term</rdfs:label>
+    </owl:Class>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_1004012"/>
+        <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
+        <owl:annotatedTarget>This is a new term to test the flow.</owl:annotatedTarget>
+        <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
+    </owl:Axiom>
+    
+
+
     <!-- http://purl.obolibrary.org/obo/MS_4000000 -->
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_4000000">
