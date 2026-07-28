@@ -31,23 +31,63 @@ def test_escape_def_backslash_and_quote():
     assert gen.escape_def('a"b\\c') == 'a\\"b\\\\c'
 
 
-def test_component_header_has_identity_but_no_release_version():
-    header = gen.build_header()
-    assert "ontology: http://purl.obolibrary.org/obo/ms/components/psi-ms-columns.owl" in header
-    assert "idspace: MSREL http://purl.obolibrary.org/obo/ms#" in header
-    assert "data-version:" not in header
+def test_output_is_a_bare_fragment_with_no_header(tmp_path):
+    # build_release_obo.py splices this into psi-ms-core.obo. A header clause would land
+    # mid-file there and every OBO parser rejects that ("expected EOI, Comment, or
+    # TermClause"), so the fragment must open on a stanza and carry no header at all.
+    p = tmp_path / "c.tsv"
+    write_tsv(p, [["Acme", "C18", "RP", "L1"]])
+    obo, _, _ = gen.build_columns_obo(gen.load_models(str(p)), {})
+    assert obo.startswith("[Term]")
+    for clause in ("format-version:", "data-version:", "ontology:", "subsetdef:",
+                   "idspace:", "default-namespace:", "[Typedef]"):
+        assert clause not in obo, f"{clause} belongs in psi-ms-core.obo, not the fragment"
 
 
-def test_every_term_carries_the_declared_columns_subset(tmp_path):
-    # A subset: clause on a term whose subsetdef is missing is the defect the imported
-    # UO terms already have, so assert declaration and use together.
+def test_fragment_uses_no_idspace_prefixes(tmp_path):
+    # After the splice there is one document, whose header (core's) declares everything
+    # bare. A prefixed id here would have nothing to resolve against.
+    p = tmp_path / "c.tsv"
+    write_tsv(p, [["Acme", "C18", "RP", "L1"]])
+    obo, _, _ = gen.build_columns_obo(gen.load_models(str(p)), {})
+    assert "MSREL:" not in obo and "MSSUB:" not in obo
+    assert "relationship: has_separation_mode " in obo
+    assert 'property_value: usp_designation "' in obo
+
+
+def test_every_external_reference_is_listed_in_required_core_terms(tmp_path):
+    # check_core_refs is the only thing standing between a core rename and a silently
+    # broken release, and it can only check what REQUIRED_CORE_TERMS lists. Exercise
+    # every separation mode so a new MODE_INFO entry cannot be added without one.
+    p = tmp_path / "c.tsv"
+    write_tsv(p, [["Acme", f"C18-{tsv_mode}", tsv_mode, "L1"]
+                  for tsv_mode in sorted(gen.TSV_MODE)])
+    obo, _, _ = gen.build_columns_obo(gen.load_models(str(p)), {})
+
+    defined = {line[len("id: "):] for line in obo.splitlines() if line.startswith("id: ")}
+    referenced = set()
+    for line in obo.splitlines():
+        if line.startswith("is_a: "):
+            referenced.add(line[len("is_a: "):].split(" !")[0])
+        elif line.startswith("relationship: "):
+            referenced.add(line.split()[2].split(" !")[0])
+    external = referenced - defined
+
+    assert external, "fragment should reference core terms it does not define"
+    missing = external - set(gen.REQUIRED_CORE_TERMS)
+    assert not missing, f"referenced but not checked against core: {sorted(missing)}"
+
+
+def test_every_term_carries_the_columns_subset(tmp_path):
+    # The subsetdef lives in psi-ms-core.obo; the fragment only uses it. A subset: clause
+    # whose subsetdef is missing is the defect the imported UO terms already have.
     p = tmp_path / "c.tsv"
     write_tsv(p, [["Acme", "C18", "RP", "L1"], ["Acme", "C8", "HILIC", ""]])
     obo, _, _ = gen.build_columns_obo(gen.load_models(str(p)), {})
-    assert f'subsetdef: {gen.SUBSET} "' in obo
-    # parent + vendor + two leaves, each tagged exactly once
-    assert obo.count("[Term]") == 4
-    assert obo.count(f"subset: {gen.SUBSET}") == 4
+    assert gen.SUBSET == "columns"
+    # vendor + two leaves, each tagged exactly once; the parent is core's now
+    assert obo.count("[Term]") == 3
+    assert obo.count(f"subset: {gen.SUBSET}") == 3
 
 
 def test_leaf_label_collision_suffix():
@@ -230,6 +270,5 @@ def test_integration_backslash_name_escaped(tmp_path):
     out.write_text(obo, encoding="utf-8")
     fastobo.load(str(out))                                   # no fold / no crash
     assert "name: C18\\\\" in obo
-    # the def clause survived (one per term: parent + vendor + leaf); counted past the
-    # header so typedef definitions there do not skew it
-    assert obo.split("[Term]", 1)[1].count('def: "') == 3
+    # the def clause survived: one per term, vendor + leaf (the parent lives in core)
+    assert obo.count('def: "') == 2

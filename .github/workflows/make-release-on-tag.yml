@@ -1,32 +1,27 @@
-name: publish-release
+name: release-on-tag
 
+# Controls when the action will run.
 on:
   push:
-    branches: [master]
-    paths:
-      - "psi-ms.obo"
-      - "psi-ms.owl"
+    tags:
+      - "*"
 
 jobs:
   make-release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Verify release metadata
+      - uses: actions/checkout@v2
+      - name: Extract version from OBO
         run: |
-          CV_VERSION=$(tr -d '[:space:]' < VERSION)
-          grep -Fx "data-version: ${CV_VERSION}" psi-ms.obo
-          grep -F "http://purl.obolibrary.org/obo/ms/${CV_VERSION}/ms.owl" psi-ms.owl
-          echo "CV_VERSION=${CV_VERSION}" >> "$GITHUB_ENV"
+          CV_VERSION=`grep data-version psi-ms.obo | grep -oP "(\d+.\d+.\d+)"`
+          echo CV_VERSION=${CV_VERSION}
+          echo "CV_VERSION=${CV_VERSION}" >> $GITHUB_ENV
           cp psi-ms.owl ms.owl
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ env.CV_VERSION }}
           name: Release v${{ env.CV_VERSION }}
-          commit: ${{ github.sha }}
           artifacts: "psi-ms.obo,*ms.owl"
           generateReleaseNotes: true
           token: ${{ secrets.PSI_MS_CV_GITHUB_TOKEN }}

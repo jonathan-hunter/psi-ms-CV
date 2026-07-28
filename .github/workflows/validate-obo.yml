@@ -12,7 +12,8 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+  # Validates the files as committed. On a source PR that is psi-ms-core.obo and the
+  # fragment; on the bot's update-release-obo PR it also covers the rebuilt psi-ms.obo.
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -22,13 +23,12 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     # Runs a single command using the runners shell
     - name: Validate OBO files
       run: |
         fastobo-validator --duplicates psi-ms-core.obo
-        fastobo-validator --duplicates psi-ms-columns.obo
         fastobo-validator --duplicates psi-ms.obo
     - uses: actions/setup-python@v6
       with:
@@ -37,38 +37,35 @@ jobs:
       run: |
         python -m pip install fastobo
         python scripts/check_sorted.py psi-ms-core.obo
+        python scripts/check_sorted.py psi-ms-columns.obo-fragment
         python scripts/check_sorted.py psi-ms.obo
-        python scripts/check_sorted.py psi-ms-columns.obo
-    - name: Check column module ids and mapping
+    - name: Check column fragment ids and mapping
       run: |
-        python scripts/chrom_columns/check_no_duplicate_ids.py psi-ms-columns.obo
-        python scripts/chrom_columns/check_column_mapping.py .github/repo-rt/psi-ms-column-ids.tsv psi-ms-columns.obo
-    - name: Check the components do not collide
-      # ROBOT would fuse a term id defined in both components instead of failing, so
-      # this has to run before the merge -- see scripts/check_components_disjoint.py.
-      run: python scripts/check_components_disjoint.py psi-ms-core.obo psi-ms-columns.obo
+        python scripts/chrom_columns/check_no_duplicate_ids.py psi-ms-columns.obo-fragment
+        python scripts/chrom_columns/check_column_mapping.py .github/repo-rt/psi-ms-column-ids.tsv psi-ms-columns.obo-fragment
+    - name: Check core still provides the terms the fragment references
+      # The fragment's is_a/relationship targets live in psi-ms-core.obo, so a rename or
+      # deletion there breaks the release while both files stay individually valid -- a
+      # fragment referencing core is legitimate by design, so no per-file validator can
+      # see it. This asserts the exact ids and names the generator depends on.
+      run: python scripts/chrom_columns/generate_psi_ms_columns.py --check-core-refs
 
-  # Builds the merged release files from the PR's components and validates them, then
-  # throws them away -- update-owl.yaml still generates and commits the real ones after
-  # merge. Without this the merge is first exercised on master, and cross-component
-  # breakage (columns referencing a core term that moved) lands before anyone sees it.
-  build-aggregate:
+  # The committed psi-ms.obo is rebuilt after merge, so on a source PR it is one build
+  # behind and validating it proves nothing about the change under review. This builds
+  # what the PR *would* release and validates that instead, then throws it away.
+  build-release:
     runs-on: ubuntu-latest
+    container:
+      image: obolibrary/odkfull
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-java@v5
-      with:
-        distribution: temurin
-        java-version: "21"
     - uses: actions/setup-python@v6
       with:
-        python-version: '3.10'
-    - name: Download ROBOT
+          python-version: '3.10'
+    - name: Splice and validate the release OBO this PR would produce
       run: |
-        curl -fsSL --retry 3 -o robot.jar \
-          "https://github.com/ontodev/robot/releases/download/v$(make -s print-robot-version)/robot.jar"
-    - name: Build and verify the merged release files
-      run: |
-        make ROBOT="java -Xmx6G -jar robot.jar" release verify
         python -m pip install fastobo
-        python scripts/check_sorted.py psi-ms.obo
+        python scripts/build_release_obo.py --output /tmp/psi-ms.obo
+        fastobo-validator --duplicates /tmp/psi-ms.obo
+        python scripts/check_sorted.py /tmp/psi-ms.obo
+        python scripts/check_aggregate.py /tmp/psi-ms.obo

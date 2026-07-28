@@ -7,18 +7,22 @@ The [Human Proteome Organization (HUPO)–Proteomics Standards Initiative (PSI)]
 
 ### OBO and OWL files
 
-The ontology is maintained as two OBO source components and released in OBO and OWL:
+The ontology is maintained as two source files and released in OBO and OWL:
 
-- **psi-ms-core.obo**: manually maintained PSI-MS terms.
-- **psi-ms-columns.obo**: chromatographic-column terms generated from repo-rt.
-- **psi-ms.obo** and **psi-ms.owl**: read-only release files generated from both components.
-- **VERSION**: the version assigned to the merged release files. Components are versioned by Git and do not carry `data-version` headers.
+- **psi-ms-core.obo**: manually maintained PSI-MS terms. Carries the `data-version` the release is stamped with, and declares every typedef and subsetdef the vocabulary uses.
+- **psi-ms-columns.obo-fragment**: chromatographic-column terms (MS:5000000–MS:5999999) generated from repo-rt. Term stanzas only, no header — it is not a standalone OBO document.
+- **psi-ms.obo** and **psi-ms.owl**: read-only release files.
 
-ROBOT performs the merge, assigns the release ontology/version IRIs, writes `psi-ms.owl`, and converts that same merged ontology to `psi-ms.obo`.
+`psi-ms.obo` is built by splicing the fragment into `psi-ms-core.obo` after the end of its
+MS: block, so the two artefacts differ only by the column terms:
 
 ```sh
-make ROBOT="java -jar /path/to/robot.jar" release verify
+python scripts/build_release_obo.py
 ```
+
+That is a pure text insertion, which keeps the released `psi-ms.obo` byte-stable — a
+release diff shows only real content changes. ROBOT then generates `psi-ms.owl` from
+`psi-ms.obo` one-way; nothing is ever converted back.
 
 Do not edit either release file directly.
 
@@ -30,15 +34,20 @@ term, from proposing the term name and description to defining its relationships
 
 ### Submitting a new term 
 
-To submit a new term, fork this repository or create a branch, add the term to **psi-ms-core.obo**, and increment **VERSION**. Do not modify `psi-ms.obo` or `psi-ms.owl`; the release workflow regenerates both. Then open a pull request for review by a HUPO-PSI CV maintainer. Alternatively, open an issue with the available information and we will help prepare the term.
+To submit a new term, fork this repository or create a branch, add the term to **psi-ms-core.obo**, and increment its `data-version`. Do not modify `psi-ms.obo` or `psi-ms.owl`; the release workflows regenerate both. Then open a pull request for review by a HUPO-PSI CV maintainer. Alternatively, open an issue with the available information and we will help prepare the term.
 
 > If you're requesting multiple related terms, you can submit them in a single issue/pull request.
 
-When either source component changes, increment `VERSION` and add your name to the contributor remarks in `psi-ms-core.obo`. Release metadata is added by ROBOT, so component headers do not need `date` or `data-version` edits.
+When `psi-ms-core.obo` changes, increment its `data-version`, refresh `date`, and add your name to the contributor remarks. The version must be greater than master's:
 
 ```text
-4.1.258
+data-version: 4.1.259
+date: 28:07:2026 12:08
 ```
+
+`psi-ms-columns.obo-fragment` is generated — do not edit it by hand. Change
+`scripts/chrom_columns/generate_psi_ms_columns.py` and regenerate, or the weekly repo-rt
+sync will overwrite you.
 
 ### How to cite
 

@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
-"""Fail if the merged release OBO has unresolved references or unnamed terms.
+"""Fail if the spliced release OBO has unresolved references or unnamed terms.
 
-The two source components cannot be checked for reference integrity on their own:
-psi-ms-columns.obo deliberately points at core terms (MS:1000857, MS:1003920,
-MS:1003921 and the technique terms), so a per-file validator sees dangling ids it
-must tolerate. ROBOT does not close the gap either -- merging with a missing target
-succeeds and obo2owl simply declares an unlabelled class, so the breakage reaches
-the release as a term with no name rather than as a failed build.
+The two source files cannot be checked for reference integrity on their own:
+psi-ms-columns.obo-fragment deliberately points at core terms (MS:1004011, MS:1003921
+and the separation-mode terms), so a per-file validator sees dangling ids it must
+tolerate. Nothing downstream closes the gap either -- the splice is a text insertion
+that cannot know a target is missing, and obo2owl then declares an unlabelled class,
+so the breakage reaches the release as a term with no name rather than a failed build.
 
-This runs against the merged psi-ms.obo (built in CI, not the committed copy) and
-asserts what only the aggregate can prove: every MS:/PEFF: id referenced by a term
-is defined in the file, and every term carries a name. Ids in other namespaces
-(UO:, PATO:, NCIT:) are imported and are not expected to be defined here.
+This runs against the spliced psi-ms.obo and asserts what only the merged file can
+prove: every MS:/PEFF: id referenced by a term is defined in the file, and every term
+carries a name. Ids in other namespaces (UO:, PATO:, NCIT:) are imported and are not
+expected to be defined here.
+
+Related but narrower: `generate_psi_ms_columns.py --check-core-refs` checks the same
+cross-file targets by id *and name*, so it also catches a rename -- which resolves
+fine here, leaving only the `! label` comments silently wrong.
 
 Usage:
     python scripts/check_aggregate.py <merged.obo>

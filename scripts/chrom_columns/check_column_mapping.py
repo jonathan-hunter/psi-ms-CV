@@ -4,7 +4,7 @@
 The mapping is the cross-repo contract repo-rt joins on to back-propagate ids, but it is
 otherwise unvalidated. This checks: an exact 3-column header; every data row has three
 tab-separated fields; each psi_ms_id is an in-band MS:5xxxxxx leaf id; ids are unique;
-and the mapping's id set matches the leaf-term ids in psi-ms-columns.obo exactly (so no
+and the mapping's id set matches the leaf-term ids in psi-ms-columns.obo-fragment exactly (so no
 model is missing an id and no leaf is missing from the mapping).
 
 Usage:

@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
-"""Generate psi-ms-columns.obo: model-level chromatographic column terms.
+"""Generate psi-ms-columns.obo-fragment: model-level chromatographic column terms.
 
-Reads the repo-rt column catalog (a TSV) and writes a self-contained OBO module
-holding the whole column-model branch in the MS:5000000 namespace:
+Reads the repo-rt column catalog (a TSV) and writes an OBO *fragment* -- [Term]
+stanzas only, no header and no typedefs -- holding the vendor and model terms in
+the MS:5000000 namespace:
 
-    MS:5000000  chromatographic column model                  (branch parent)
-      MS:5000001+  <vendor> chromatographic column model      (one per vendor)
-        MS:5001000+  <product>                                (one per model)
-          is_a <vendor> chromatographic column model
-          is_a MS:1003921 ! liquid chromatographic column
-          relationship: MSREL:has_separation_mode ...           (when known)
-          property_value: MSREL:usp_designation "..." xsd:string (per USP code)
+    MS:5000000+  <vendor> chromatographic column model      (one per vendor)
+      MS:5001000+  <product>                                (one per model)
+        is_a <vendor> chromatographic column model
+        is_a MS:1003921 ! liquid chromatographic column
+        relationship: has_separation_mode ...               (when known)
+        property_value: usp_designation "..." xsd:string    (per USP code)
+
+The branch parent (MS:1004011 chromatographic column model) lives in psi-ms-core.obo,
+as do every typedef and the `columns` subsetdef these stanzas use. The fragment is
+deliberately not a standalone OBO document: scripts/build_release_obo.py splices it
+into psi-ms-core.obo to produce the psi-ms.obo release artefact, and a header clause
+appearing mid-file would be a syntax error there.
 
 This generator does not correct or infer data — it only
 verifies the input is valid UTF-8 and well-formed (correct field counts) and aborts
@@ -19,9 +25,9 @@ the "usp" column; each should be identical on every row of a model, so a field i
 emitted only when every row agrees — any within-model disagreement emits nothing for
 that field and is reported for upstream fixing (no majority guess is made).
 
-References to MS:1000857, MS:1003920, MS:1003921 and the MS:1002271 technique
-terms are external to this module and resolve against psi-ms-core.obo. ROBOT merges
-the two source components to produce the versioned psi-ms.obo and psi-ms.owl releases.
+Every term this fragment references but does not define is listed in
+REQUIRED_CORE_TERMS and checked against psi-ms-core.obo before any output is written
+(also available standalone via --check-core-refs, which CI runs on PRs touching core).
 
 IDs are stable across runs: existing terms keep their id (read back from the
 output file), and only genuinely new vendors/models get the next free id. This
@@ -38,12 +44,13 @@ the run, and a new label carrying a stale id is reported as a likely rename.
 --reset-ids ignores the existing OBO and assigns clean sequential ids (used once to
 mint the initial baseline).
 
-This component is versioned by Git, not by an OBO data-version. The repository VERSION
-file supplies the version only when ROBOT builds the merged release artefacts.
+This fragment is versioned by Git and carries no data-version of its own; the release
+version is psi-ms-core.obo's `data-version`, which the splice copies through.
 
 Usage:
     python scripts/chrom_columns/generate_psi_ms_columns.py \\
-        --input column_database.tsv --output psi-ms-columns.obo
+        --input column_database.tsv --output psi-ms-columns.obo-fragment
+    python scripts/chrom_columns/generate_psi_ms_columns.py --check-core-refs
 """
 
 import argparse
@@ -55,53 +62,45 @@ from collections import Counter, defaultdict
 
 import pandas as pd
 
-OUTPUT_DEFAULT = "psi-ms-columns.obo"
+OUTPUT_DEFAULT = "psi-ms-columns.obo-fragment"
 INPUT_DEFAULT = ".jeh-local/column_database_fixed.tsv"
 MAPPING_DEFAULT = ".github/repo-rt/psi-ms-column-ids.tsv"
+CORE_DEFAULT = "psi-ms-core.obo"
 
 # ID bands within the MS:5000000 namespace (kept separate so the file stays
 # grouped scaffold-then-leaves even as new terms are appended over time).
-PARENT_ID = "MS:5000000"
-VENDOR_BAND = (5000001, 5000999)
+# The vendor band opens at MS:5000000: that id previously held the branch parent,
+# which now lives in psi-ms-core.obo as MS:1004011. Note assign_ids is append-only
+# by design -- a retired id must never be handed to a different term -- so 5000000
+# is only reachable on a --reset-ids run, not by the next vendor to appear.
+VENDOR_BAND = (5000000, 5000999)
 LEAF_BAND = (5001000, 5999999)
 
 # A regenerated catalog retaining fewer than this fraction of the prior model count
 # is treated as a truncated/corrupt download and aborts (guarded in build_columns_obo).
 MIN_RETAIN_FRACTION = 0.5
 
-# Subset carried by every term in this module, so consumers can include or exclude the
-# whole column branch. Declared here and in psi-ms-core.obo -- core's header is the one
-# guaranteed to reach the release, this one keeps the module valid standalone.
-SUBSET = "MSSUB:columns"
+# Subset carried by every term in this fragment, so consumers can include or exclude the
+# whole column branch. `subsetdef: columns` is declared once, in psi-ms-core.obo -- the
+# fragment has no header to declare it in, and after the splice there is only one document.
+SUBSET = "columns"
 
-# Cross-file targets, defined in psi-ms-core.obo.
-RUN_ATTRIBUTE = "MS:1000857"
-CHROM_COLUMN = "MS:1003920"
+# The branch parent, plus every other term these stanzas reference but do not define.
+# All live in psi-ms-core.obo. Checked before writing output (see check_core_refs): a
+# deletion breaks the release, and a rename leaves `! label` comments contradicting the
+# term they point at, which nothing downstream would flag.
+PARENT_ID = "MS:1004011"
 LIQUID_COLUMN = "MS:1003921"
-
-def build_header():
-    return f"""\
-format-version: 1.2
-saved-by: Jonathan Hunter
-subsetdef: {SUBSET} "Chromatographic column models"
-default-namespace: MS
-idspace: MSREL http://purl.obolibrary.org/obo/ms#
-remark: Model-level chromatographic column terms (MS:5000000 namespace), generated from the RepoRT column database, https://github.com/michaelwitting/RepoRT.
-remark: See Kretschmer F, Harrieder EM, Hoffmann MA, Boecker S, Witting M. RepoRT: a comprehensive repository for small molecule retention times. Nat Methods. 2024;21(2):153-155. PMID:38191934, doi:10.1038/s41592-023-02143-z
-remark: Merged with psi-ms-core.obo by ROBOT to build the PSI-MS release files.
-remark: coverage of namespace-id: MS:$sequence(7,5000000,5999999)$: Chromatographic column models
-ontology: http://purl.obolibrary.org/obo/ms/components/psi-ms-columns.owl
-
-[Typedef]
-id: MSREL:has_separation_mode
-name: has_separation_mode
-
-[Typedef]
-id: MSREL:usp_designation
-name: usp_designation
-def: "The United States Pharmacopeia packing classification code, such as L1, assigned to a chromatographic column's stationary phase." []
-is_metadata_tag: true
-"""
+REQUIRED_CORE_TERMS = {
+    PARENT_ID: "chromatographic column model",
+    LIQUID_COLUMN: "liquid chromatographic column",
+    "MS:1003579": "ion-exchange chromatography",
+    "MS:1003580": "size-exclusion chromatography",
+    "MS:1003582": "reversed phase chromatography",
+    "MS:1003583": "normal phase chromatography",
+    "MS:1003584": "hydrophilic interaction liquid chromatography",
+    "MS:1003586": "mixed mode chromatography",
+}
 
 # Separation-mode key -> (technique term id, label, definition adjective).
 MODE_INFO = {
@@ -351,20 +350,6 @@ def leaf_definition(vendor, mode):
 
 # --- stanza builders (return text, no trailing blank line) ------------------
 
-def parent_stanza():
-    lines = [
-        "[Term]",
-        f"id: {PARENT_ID}",
-        "name: chromatographic column model",
-        'def: "A specific chromatographic column product, identified by its '
-        'manufacturer and product name." [PSI:MS]',
-        f"subset: {SUBSET}",
-        f"is_a: {RUN_ATTRIBUTE} ! run attribute",
-        f"relationship: MSREL:part_of {CHROM_COLUMN} ! chromatographic column",
-    ]
-    return "\n".join(lines)
-
-
 def vendor_stanza(vendor, vendor_id):
     definition = with_period(f"Chromatographic column model manufactured by {vendor}")
     lines = [
@@ -390,10 +375,47 @@ def leaf_stanza(leaf_id, vendor, vendor_id, label, mode, usp_literals):
     ]
     if mode:
         mode_id, mode_label, _ = MODE_INFO[mode]
-        lines.append(f"relationship: MSREL:has_separation_mode {mode_id} ! {mode_label}")
+        lines.append(f"relationship: has_separation_mode {mode_id} ! {mode_label}")
     for code in usp_literals:
-        lines.append(f'property_value: MSREL:usp_designation "{escape_def(code)}" xsd:string')
+        lines.append(f'property_value: usp_designation "{escape_def(code)}" xsd:string')
     return "\n".join(lines)
+
+
+# --- cross-file reference check ----------------------------------------------
+
+def check_core_refs(core_path):
+    """Verify every REQUIRED_CORE_TERMS id is defined in core under the expected name.
+
+    The fragment references these but cannot define them, and no per-file validator can
+    see the mismatch: the fragment referencing core is legitimate by design. Names are
+    compared as well as ids because a rename is the likelier accident -- the id still
+    resolves after one, so the merged release ships silently wrong `! label` comments.
+
+    Raises ValueError listing every problem, rather than stopping at the first.
+    """
+    names = {}
+    current = None
+    with open(core_path, encoding="utf-8") as fh:
+        for line in fh:
+            if line.startswith("id: "):
+                current = line[len("id: "):].strip()
+            elif line.startswith("name: ") and current:
+                names[current] = line[len("name: "):].strip()
+                current = None
+
+    problems = []
+    for term_id, expected in sorted(REQUIRED_CORE_TERMS.items()):
+        actual = names.get(term_id)
+        if actual is None:
+            problems.append(f"{term_id} is not defined in {core_path} (expected {expected!r})")
+        elif actual != expected:
+            problems.append(f"{term_id} is named {actual!r} in {core_path}, expected {expected!r}")
+    if problems:
+        raise ValueError(
+            "psi-ms-core.obo no longer provides the terms this fragment references:\n  "
+            + "\n  ".join(problems)
+        )
+    return len(REQUIRED_CORE_TERMS)
 
 
 # --- stable id assignment ----------------------------------------------------
@@ -520,14 +542,14 @@ def build_columns_obo(models, existing):
     # Defence in depth: assign_ids mints unique ids by construction, but a corrupt
     # committed OBO (two names sharing one id) would be reused faithfully. Refuse to
     # emit a duplicate-id module rather than ship one in an auto-PR.
-    id_counts = Counter([PARENT_ID, *vendor_id.values(), *leaf_ids.values()])
+    id_counts = Counter([*vendor_id.values(), *leaf_ids.values()])
     dup_ids = sorted(i for i, n in id_counts.items() if n > 1)
     if dup_ids:
         raise ValueError(f"duplicate ids generated (corrupt existing-id map?): {dup_ids}")
 
     renames = cross_check_mirror(models, labels, leaf_ids, existing)
 
-    stanzas = [(int(PARENT_ID.split(":")[1]), parent_stanza())]
+    stanzas = []
     for vendor in vendors:
         vid = vendor_id[vendor]
         stanzas.append((int(vid.split(":")[1]), vendor_stanza(vendor, vid)))
@@ -546,8 +568,7 @@ def build_columns_obo(models, existing):
 
     stanzas.sort(key=lambda pair: pair[0])
     body_block = "\n\n".join(text for _, text in stanzas) + "\n"
-    obo_text = build_header() + "\n" + body_block
-    return obo_text, build_mapping_tsv(models, labels, leaf_ids), report
+    return body_block, build_mapping_tsv(models, labels, leaf_ids), report
 
 
 def print_report(models, report):
@@ -591,8 +612,18 @@ def main():
     parser.add_argument("--reset-ids", action="store_true",
                         help="ignore existing ids in --output and assign clean sequential ids")
     parser.add_argument("--report", help="write a Markdown data-quality summary to this path")
+    parser.add_argument("--core", default=CORE_DEFAULT,
+                        help="psi-ms-core.obo, checked for the terms this fragment references")
+    parser.add_argument("--check-core-refs", action="store_true",
+                        help="only verify --core provides REQUIRED_CORE_TERMS, then exit")
     args = parser.parse_args()
 
+    if args.check_core_refs:
+        n = check_core_refs(args.core)
+        print(f"{args.core}: all {n} referenced terms present with expected names")
+        return
+
+    check_core_refs(args.core)
     models = load_models(args.input)
     if args.reset_ids:
         existing = {}

@@ -1,0 +1,75 @@
+name: "Build release OBO"
+
+# Splices the generated column fragment into psi-ms-core.obo to produce psi-ms.obo,
+# the release artefact and the file OBO Foundry fetches from master. The sources are
+# psi-ms-core.obo (hand-maintained, carries data-version) and psi-ms-columns.obo-fragment
+# (generated from repo-rt); psi-ms.obo is never edited directly.
+#
+# This is step one of the release chain. Committing psi-ms.obo triggers update-owl.yaml,
+# which generates psi-ms.owl and cuts the tag, which triggers make-release-on-tag.yml.
+# That is why this workflow commits only the OBO -- the OWL is not its business.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "psi-ms-core.obo"
+      - "psi-ms-columns.obo-fragment"
+  workflow_dispatch: {}
+
+jobs:
+  build-obo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Splice the release OBO
+        # Pure text insertion, stdlib only -- no ROBOT and no Java on this path.
+        run: python scripts/build_release_obo.py
+
+      - name: Validate the spliced release
+        run: |
+          python -m pip install fastobo
+          python scripts/check_sorted.py psi-ms.obo
+          python scripts/check_aggregate.py psi-ms.obo
+
+      - name: Create pull request
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PSI_MS_CV_GITHUB_TOKEN }}
+          add-paths: psi-ms.obo
+          commit-message: Update release OBO file
+          committer: GitHub <noreply@github.com>
+          author: GitHub <noreply@github.com>
+          branch: update-release-obo
+          delete-branch: true
+          title: Update release OBO file
+          body: |
+            psi-ms.obo rebuilt from `psi-ms-core.obo` and `psi-ms-columns.obo-fragment`
+            by `scripts/build_release_obo.py`. Merging this triggers the OWL build and
+            the release tag.
+
+      - name: Approve pull request
+        if: (steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated')
+        uses: juliangruber/approve-pull-request-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ steps.cpr.outputs.pull-request-number }}
+
+      - name: Merge pull request
+        if: (steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated')
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: ${{ secrets.PSI_MS_CV_GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash

@@ -1,11 +1,16 @@
 name: OWL file validation
 
+# Master only, deliberately. This job fetches both its config and the ontology from the
+# master raw URLs -- foundry.json's ontology_purl points at master/psi-ms.owl -- so on a
+# pull request it validated master's published OWL and could not fail because of the PR
+# under review: a green check that meant nothing. It still runs on push to master, which
+# is when update-owl.yaml commits a new psi-ms.owl, so the OWL is validated at the first
+# moment it exists.
 on:
   push:
     branches: [master, dev, "debug/ols-validation"]
 
-  pull_request:
-    branches: [master, dev]
+  workflow_dispatch: {}    # allow manual runs
 
 jobs:
   build:

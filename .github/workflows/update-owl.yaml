@@ -1,52 +1,59 @@
-name: "Build PSI-MS release files"
+name: "Update OWL"
 
+# Fires on the built release OBO, not on the sources. build-release-obo.yml splices
+# psi-ms-core.obo + psi-ms-columns.obo-fragment into psi-ms.obo first; without this
+# path filter that step and this one would both fire on a source push, and the OWL
+# would be generated from the previous psi-ms.obo while the splice was still running.
 on:
   push:
     branches: [master]
     paths:
-      - "psi-ms-core.obo"
-      - "psi-ms-columns.obo"
-      - "VERSION"
-      - "Makefile"
-  workflow_dispatch: {}
+      - "psi-ms.obo"
 
 jobs:
-  generate-release-files:
+  generate-owl:
+    if: ${{ ! contains(github.event.head_commit.message, 'Update OWL file') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
-      - name: Set up Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "21"
-      - name: Download ROBOT
+        uses: actions/checkout@v3
+      - name: Extract version from OBO
         run: |
-          curl -fsSL --retry 3 -o robot.jar \
-            "https://github.com/ontodev/robot/releases/download/v$(make -s print-robot-version)/robot.jar"
-      - name: Build merged OBO and OWL releases
-        # `verify` holds the same assertions the PR build check runs, so the committed
-        # artefacts are held to the contract already proven before merge.
-        run: make ROBOT="java -Xmx6G -jar robot.jar" release verify
+          CV_VERSION=`grep data-version psi-ms.obo | grep -oP "(\d+.\d+.\d+)"`
+          echo CV_VERSION=${CV_VERSION}
+          echo "CV_VERSION=${CV_VERSION}" >> $GITHUB_ENV
+      - name: Generate OWL
+        run: |
+          # Replace the imports of the UO and PATO ontology .obo files with the equivalent .owl files
+          cp psi-ms.obo tmp.obo
+          sed -e "s/pato.obo/pato.owl/g" -e "s/uo.obo/uo.owl/g" -i tmp.obo
+          head -n 50 tmp.obo
+
+          python -m pip install fastobo
+          python scripts/prepare_template.py tmp.obo cv_template.tsv
+          echo Generated template with `wc -l cv_template.tsv`
+
+          wget -nv --no-check-certificate https://github.com/ontodev/robot/releases/download/v1.9.5/robot.jar
+          export JAVA_TOOL_OPTIONS=-Xmx6G
+          # java -jar robot.jar -vvv template -p "PEFF: http://purl.obolibrary.org/obo/PEFF_" -i psi-ms.obo -t cv_template.tsv convert -f ofn -o psi-ms.owl
+          java -jar robot.jar convert -v -i tmp.obo -o psi-ms.owl --format owl
+          rm *robot.jar*
+          rm *tmp.obo* *cv_template.tsv*
       - name: Create pull request
         id: cpr
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.PSI_MS_CV_GITHUB_TOKEN }}
-          add-paths: |
-            psi-ms.obo
-            psi-ms.owl
-          commit-message: Update PSI-MS release files
+          commit-message: Update OWL file
           committer: GitHub <noreply@github.com>
           author: GitHub <noreply@github.com>
-          branch: update-release-files
+          branch: update-owl-file
           delete-branch: true
-          title: Update PSI-MS release files
-          body: ROBOT-generated `psi-ms.obo` and `psi-ms.owl` from the two source components and `VERSION`.
+          title: Update OWL file
+          body: This automated PR updates the OWL file corresponding to the OBO file
       - name: Approve pull request
         if: (steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated')
         uses: juliangruber/approve-pull-request-action@v1
@@ -60,3 +67,10 @@ jobs:
           token: ${{ secrets.PSI_MS_CV_GITHUB_TOKEN }}
           pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
           merge-method: squash
+      - name: GitHub Tag
+        id: new_tag
+        uses: mathieudutour/github-tag-action@v5.6
+        with:
+          github_token: ${{ secrets.PSI_MS_CV_GITHUB_TOKEN }}
+          pre_release_branches: test-tag
+          custom_tag: ${{ env.CV_VERSION }}

@@ -4,7 +4,7 @@
 fastobo.load and check_sorted.py both accept duplicate ids (load does not enforce
 uniqueness; check_sorted only flags strictly-decreasing ids), and the duplicate-aware
 fastobo-validator is not installed on the bare-runner sync job. This stdlib-only check
-closes that gap for the auto-generated psi-ms-columns.obo before it is opened in a PR.
+closes that gap for the auto-generated psi-ms-columns.obo-fragment before it is opened in a PR.
 
 Usage:
     python scripts/chrom_columns/check_no_duplicate_ids.py [obo_file]
@@ -20,7 +20,7 @@ def duplicate_ids(path):
 
 
 def main(argv):
-    path = argv[1] if len(argv) > 1 else "psi-ms-columns.obo"
+    path = argv[1] if len(argv) > 1 else "psi-ms-columns.obo-fragment"
     dupes, total = duplicate_ids(path)
     if dupes:
         print(f"ERROR: duplicate ids in {path}: {dupes}", file=sys.stderr)
