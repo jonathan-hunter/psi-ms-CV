@@ -26343,6 +26343,12 @@ is_a: MS:1000857 ! run attribute
 relationship: part_of MS:1003920 ! chromatographic column
 
 [Term]
+id: MS:1004012
+name: new test term
+def: "This is a new term to test the flow." [PSI:MS]
+is_a: MS:1001456 ! analysis software
+
+[Term]
 id: MS:4000000
 name: PSI-MS CV Quality Control Vocabulary
 def: "PSI Quality Control controlled vocabulary term." [PSI:MS]
