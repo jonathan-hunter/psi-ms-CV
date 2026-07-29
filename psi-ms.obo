@@ -1,7 +1,7 @@
 format-version: 1.2
-data-version: 4.1.258
+data-version: 4.1.259
 date: 28:07:2026 15:14
-saved-by: Douwe Schulte
+saved-by: Jonathan Hunter
 default-namespace: MS
 subsetdef: columns "Chromatographic column models"
 namespace-id-rule: * MS:$sequence(7,0,9999999)$
@@ -26346,6 +26346,12 @@ relationship: part_of MS:1003920 ! chromatographic column
 id: MS:1004012
 name: new test term
 def: "This is a new term to test the flow." [PSI:MS]
+is_a: MS:1001456 ! analysis software
+
+[Term]
+id: MS:1004013
+name: new test term two
+def: "This is a second new term to test the flow." [PSI:MS]
 is_a: MS:1001456 ! analysis software
 
 [Term]
