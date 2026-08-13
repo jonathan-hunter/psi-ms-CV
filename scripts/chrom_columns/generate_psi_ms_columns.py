@@ -35,19 +35,23 @@ ids -- and is read back before any id is minted. Identity is the catalog key, ne
 the displayed label, so a model gaining or losing a collision suffix (or any other
 label change) keeps its id. The ledger is append-only: a model that leaves the
 catalog keeps its row (its term is dropped from the fragment, but its id is never
-handed to another term) and a model that returns reclaims its original id. Vendor
-terms have ledger rows too, with an empty column field -- inert to repo-rt's join,
-since every real catalog row has a non-empty column.
+handed to another term) and a model that returns under the same key reclaims its
+original id. Vendor terms have ledger rows too, with an empty column field -- inert
+to repo-rt's join, since every real catalog row has a non-empty column.
 
 repo-rt mirrors each assigned id in a "psi_ms_id" catalog column (the ledger is the
 contract its add_psi_ms_id.py joins on to back-propagate ids). When present, the
 mirror is cross-validated against the ledger: a blank cell is a new model; a known
 key whose mirror disagrees aborts the run; a new key whose rows carry the id of a
 key that has left the catalog is a mirror-proven rename, and the id is transferred
-to the new key; a new key carrying any other id (live or never minted) aborts.
+to the new key; a new key carrying any other id (live or never minted) aborts. A
+rename consumes the old key's ledger row, so -- unlike a retirement -- reverting one
+upstream mints a second id for the same physical column.
 --reset-ids ignores the committed ledger and assigns clean sequential ids (used once
-to mint the initial baseline). --allow-shrink acknowledges an intentional mass
-removal of models; no flag ever moves or reuses an id.
+to mint the initial baseline; the mirror cross-check is skipped, having nothing to
+reconcile against). --allow-shrink acknowledges an intentional mass removal of
+models; --dry-run prints the report without writing either file. No flag ever moves
+or reuses an id.
 
 This fragment is versioned by Git and carries no data-version of its own; the release
 version is psi-ms-core.obo's `data-version`, which the splice copies through.
@@ -63,7 +67,9 @@ import csv
 import io
 import os
 import re
+import sys
 from collections import Counter, defaultdict
+from pathlib import Path
 
 import pandas as pd
 
@@ -98,23 +104,6 @@ MIN_RETAIN_FRACTION = 0.5
 # fragment has no header to declare it in, and after the splice there is only one document.
 SUBSET = "columns"
 
-# The branch parent, plus every other term these stanzas reference but do not define.
-# All live in psi-ms-core.obo. Checked before writing output (see check_core_refs): a
-# deletion breaks the release, and a rename leaves `! label` comments contradicting the
-# term they point at, which nothing downstream would flag.
-PARENT_ID = "MS:1004011"
-LIQUID_COLUMN = "MS:1003921"
-REQUIRED_CORE_TERMS = {
-    PARENT_ID: "chromatographic column model",
-    LIQUID_COLUMN: "liquid chromatographic column",
-    "MS:1003579": "ion-exchange chromatography",
-    "MS:1003580": "size-exclusion chromatography",
-    "MS:1003582": "reversed phase chromatography",
-    "MS:1003583": "normal phase chromatography",
-    "MS:1003584": "hydrophilic interaction liquid chromatography",
-    "MS:1003586": "mixed mode chromatography",
-}
-
 # Separation-mode key -> (technique term id, label, definition adjective).
 MODE_INFO = {
     "RP": ("MS:1003582", "reversed phase chromatography", "reversed-phase"),
@@ -125,8 +114,25 @@ MODE_INFO = {
     "mixed": ("MS:1003586", "mixed mode chromatography", "mixed-mode"),
 }
 
+# The branch parent, plus every other term these stanzas reference but do not define.
+# All live in psi-ms-core.obo. Checked before writing output (see check_core_refs): a
+# deletion breaks the release, and a rename leaves `! label` comments contradicting the
+# term they point at, which nothing downstream would flag.
+# The technique terms are derived from MODE_INFO rather than repeated, so a mode added
+# there cannot be left unchecked here.
+PARENT_ID = "MS:1004011"
+LIQUID_COLUMN = "MS:1003921"
+REQUIRED_CORE_TERMS = {
+    PARENT_ID: "chromatographic column model",
+    LIQUID_COLUMN: "liquid chromatographic column",
+    **{term_id: label for term_id, label, _ in MODE_INFO.values()},
+}
+
+# The typedefs the leaf stanzas use. Also core's, also unresolvable from this file
+# alone, and likelier than a term to be dropped unnoticed in a core edit.
+REQUIRED_CORE_TYPEDEFS = ("has_separation_mode", "usp_designation")
+
 # repo-rt "mode" column value -> separation-mode key.
-# "other", "NA" and blank stay unmapped (no has_separation_mode emitted).
 TSV_MODE = {
     "RP": "RP",
     "NP": "NP",
@@ -136,14 +142,39 @@ TSV_MODE = {
     "mixed-Mode": "mixed",
 }
 
+# Cells that legitimately carry no separation mode (compared casefolded). Any OTHER
+# unmapped value is upstream vocabulary drift -- a single casing change would strip
+# has_separation_mode from every affected term -- so it is counted and reported rather
+# than silently treated as "no mode".
+NON_MODES = {"", "na", "n/a", "other", "unknown"}
+
 # --- reading the catalog ----------------------------------------------------
 
 REQUIRED_COLUMNS = ("company", "column", "mode", "usp")
 
 
+# Invisible characters folded away by clean(). They are indistinguishable from a plain
+# space (or from nothing) in a rendered term label but distinct to ==, so two catalog
+# rows differing only by one would form two identity keys, mint two ids and emit two
+# terms with identical-looking names -- which the duplicate-label guard cannot see
+# either, because the strings genuinely differ.
+INVISIBLE = str.maketrans(
+    {
+        "\u00a0": " ",  # no-break space
+        "\u200b": "",  # zero-width space
+        "\u200c": "",  # zero-width non-joiner
+        "\u200d": "",  # zero-width joiner
+        "\u2060": "",  # word joiner
+        "\ufeff": "",  # zero-width no-break space / BOM
+    }
+)
+
+
 def clean(text):
-    """Drop control characters that would break an OBO name/def line."""
-    return "".join(ch for ch in text if ch >= " ")
+    """Normalize a catalog cell for use as an OBO name/def value and as an identity key:
+    drop control characters, fold invisible/non-breaking characters, collapse whitespace."""
+    text = "".join(ch for ch in text if ch >= " " and ch != "\x7f")
+    return re.sub(r"\s+", " ", text.translate(INVISIBLE)).strip()
 
 
 def read_catalog(tsv_path):
@@ -165,15 +196,20 @@ def read_catalog(tsv_path):
     double quotes (the CSV convention for a value containing a comma) keeps those quotes
     as literal characters. In the identity columns they would leak into term names and
     — since a quoted name differs from the previously assigned unquoted one — mint fresh
-    ids and churn the mapping, so a wrapped-quote identity field ABORTS the run."""
+    ids and churn the mapping; in the value columns they corrupt the emitted annotation
+    instead (a `usp` cell of '"L1, L11"' yields the codes '"L1' and 'L11"'). Either way
+    the file is not the tab-delimited catalog this reads, so a wrapped-quote cell in any
+    required column ABORTS the run."""
     try:
-        text = open(tsv_path, "rb").read().decode("utf-8")
+        text = Path(tsv_path).read_bytes().decode("utf-8")
     except UnicodeDecodeError as e:
         raise ValueError(
             f"{tsv_path} is not valid UTF-8 ({e}); the catalog must be pre-cleaned "
         )
     lines = text.split("\n")
     ncols = len(lines[0].split("\t")) if lines and lines[0] else 0
+    if ncols == 0:
+        raise ValueError(f"{tsv_path} is empty or has no header row")
     overlong = [
         i
         for i, ln in enumerate(lines[1:], start=2)
@@ -198,19 +234,20 @@ def read_catalog(tsv_path):
     if missing:
         raise ValueError(f"catalog is missing required columns: {missing}")
     # CSV-quoting guard (see docstring): a proper tab-delimited catalog wraps no field
-    # in quotes. Flag identity cells that arrive wrapped in a matched double-quote pair
-    # so the quoting is stripped upstream rather than silently corrupting names/ids.
+    # in quotes. Flag any required cell that arrives wrapped in a matched double-quote
+    # pair so the quoting is stripped upstream rather than silently corrupting the
+    # names and ids (company/column) or the emitted annotations (mode/usp).
     quoted = sorted(
         {
             f"{col}={cell!r}"
-            for col in ("company", "column")
+            for col in REQUIRED_COLUMNS
             for cell in df[col].str.strip()
             if len(cell) >= 2 and cell.startswith('"') and cell.endswith('"')
         }
     )
     if quoted:
         raise ValueError(
-            f"{tsv_path} has CSV-quoted identity field(s): "
+            f"{tsv_path} has CSV-quoted field(s): "
             f"{quoted[:10]}{' ...' if len(quoted) > 10 else ''}; a tab-delimited catalog "
             "must not wrap fields in double quotes (strip the quoting upstream)"
         )
@@ -218,7 +255,13 @@ def read_catalog(tsv_path):
 
 
 def load_models(tsv_path):
-    """Return {(vendor, product): {"modes": Counter, "usps": Counter, "ms_ids": Counter}}.
+    """Return (models, notes).
+
+    models  {(vendor, product): {"modes": Counter, "usps": Counter, "ms_ids": Counter}}
+    notes   input-quality counts for the report: rows dropped for a blank identity cell,
+            unmapped `mode` values, and `usp` tokens that are not USP packing codes.
+            All three are silent data loss otherwise -- the affected terms simply come
+            out missing a field -- so they are surfaced with the id changes.
 
     A catalog has many rows per model (one per physical size); grouping by
     (vendor, product) lets resolve_model vote over those rows. USP cells are
@@ -248,37 +291,80 @@ def load_models(tsv_path):
         product=df["column"].str.strip().map(clean),
         # "" (not None) for unknown modes / no codes so the columns stay all-string
         # (a None would become a truthy NaN and slip past the `if` filters below).
-        mode_key=df["mode"].str.strip().map(lambda m: TSV_MODE.get(str(m), "")),
+        mode_raw=df["mode"].str.strip(),
+        mode_key=df["mode"].str.strip().map(lambda m: TSV_MODE.get(m, "")),
         usp_canon=df["usp"].map(
             lambda u: "/".join(sorted(split_usp_codes(u), key=usp_sort_key))
         ),
         ms_id=ms_id,
     )
-    df = df[(df["vendor"] != "") & (df["product"] != "")]
+    named = df[(df["vendor"] != "") & (df["product"] != "")]
+
+    notes = {
+        "dropped_rows": len(df) - len(named),
+        "unmapped_modes": Counter(
+            raw
+            for raw, key in zip(named["mode_raw"], named["mode_key"])
+            if not key and raw.casefold() not in NON_MODES
+        ),
+        "rejected_usp": Counter(
+            token for cell in named["usp"] for token in usp_tokens(cell)[1]
+        ),
+    }
 
     models = {}
-    for (vendor, product), group in df.groupby(["vendor", "product"], sort=False):
+    for (vendor, product), group in named.groupby(["vendor", "product"], sort=False):
         models[(vendor, product)] = {
             "modes": Counter(m for m in group["mode_key"] if m),
             "usps": Counter(u for u in group["usp_canon"] if u),
             "ms_ids": Counter(i for i in group["ms_id"] if i),
         }
-    return models
+    return models, notes
 
 
 # --- resolving a model's separation mode and USP designation ----------------
 
 
+# Whole-cell "no value" spellings (compared casefolded), recognised BEFORE the cell is
+# split: 'N/A' shares its separator with a real multi-code cell, so splitting first would
+# turn it into the codes 'N' and 'A'. A USP packing code is a letter class plus a number.
+USP_PLACEHOLDERS = {"", "na", "n/a", "n.a.", "n.d.", "nd", "-", "--", "none", "null",
+                    "unknown", "?"}
+USP_CODE = re.compile(r"[LGS]\d{1,3}")
+
+
+def usp_tokens(cell):
+    """Split a raw USP cell into (codes, rejected), e.g. 'L1/L11' or 'L20, L33'.
+
+    A placeholder cell yields nothing and rejects nothing. Every other token must be a
+    USP packing code: these become permanent annotations on a published term, so an
+    unrecognised one is rejected and reported for upstream fixing rather than emitted."""
+    if cell.strip().casefold() in USP_PLACEHOLDERS:
+        return [], []
+    codes, rejected = [], []
+    for token in re.split(r"[/,;]", cell):
+        token = token.strip()
+        if not token:
+            continue
+        if USP_CODE.fullmatch(token.upper()):
+            codes.append(token.upper())
+        else:
+            rejected.append(token)
+    return codes, rejected
+
+
 def split_usp_codes(cell):
-    """Split a raw USP cell into atomic codes, e.g. 'L1/L11' or 'L20, L33'."""
-    codes = [c.strip() for c in re.split(r"[/,]", cell)]
-    return [c for c in codes if c and c != "NA"]
+    """The emittable codes of a raw USP cell (see usp_tokens)."""
+    return usp_tokens(cell)[0]
 
 
 def usp_sort_key(code):
-    # Numeric order so L9 sorts before L114 (plain string sort would invert them).
+    # Numeric order so L9 sorts before L114 (plain string sort would invert them), then
+    # the code itself so that L1/S1 and S1/L1 canonicalise to the same string: on the
+    # number alone they tie, Python's stable sort keeps input order, and one model's rows
+    # would read as two different values and be reported as a deviation.
     digits = re.sub(r"\D", "", code)
-    return int(digits) if digits else 0
+    return int(digits) if digits else 0, code
 
 
 def resolve_usp(usp_counter):
@@ -357,11 +443,16 @@ def escape_def(text):
 
 
 def escape_tag(text):
-    """Escape a value for an unquoted OBO tag line (name:). Backslash is the OBO escape
-    character, so it must be doubled; clean() already removes the newlines/tabs that
-    would otherwise need escaping in an unquoted value. Without this a trailing
-    backslash folds the next line into the name and a mid-string one deletes a char."""
-    return text.replace("\\", "\\\\")
+    """Escape a value for an unquoted OBO tag line (name:). Three characters are
+    structural in an unquoted value and each silently truncates or mangles the name:
+    backslash is the escape character (a trailing one folds the next line into the name,
+    a mid-string one deletes a character), `!` starts a comment the parser discards to
+    end of line, and `{`/`}` open a trailing-modifier block. clean() already removes the
+    newlines and tabs that would also need escaping. Backslash is doubled first, so the
+    escapes introduced below are not themselves escaped."""
+    for char in "\\", "!", "{", "}":
+        text = text.replace(char, "\\" + char)
+    return text
 
 
 def leaf_definition(vendor, mode):
@@ -414,28 +505,49 @@ def leaf_stanza(leaf_id, vendor, vendor_id, label, mode, usp_literals):
 
 
 def check_core_refs(core_path):
-    """Verify every REQUIRED_CORE_TERMS id is defined in core under the expected name.
+    """Verify core still provides every term and typedef the fragment references.
 
     The fragment references these but cannot define them, and no per-file validator can
-    see the mismatch: the fragment referencing core is legitimate by design. Names are
-    compared as well as ids because a rename is the likelier accident -- the id still
-    resolves after one, so the merged release ships silently wrong `! label` comments.
+    see the mismatch: the fragment referencing core is legitimate by design. Terms are
+    checked by name as well as id because a rename is the likelier accident -- the id
+    still resolves after one, so the merged release ships silently wrong `! label`
+    comments -- and obsoletion is likelier still in a CV maintained over years, leaving
+    the release pointing live axioms at a deprecated term.
 
     Raises ValueError listing every problem, rather than stopping at the first.
     """
-    names = {}
-    current = None
+    terms, typedefs, obsolete, replaced_by = {}, {}, set(), {}
+    table, current = None, None
     with open(core_path, encoding="utf-8") as fh:
         for line in fh:
-            if line.startswith("id: "):
-                current = line[len("id: ") :].strip()
-            elif line.startswith("name: ") and current:
-                names[current] = line[len("name: ") :].strip()
+            line = line.rstrip("\n")
+            if line.startswith("["):
+                table = {"[Term]": terms, "[Typedef]": typedefs}.get(line.strip())
                 current = None
+            elif table is None:  # header clauses, before the first stanza
+                continue
+            elif line.startswith("id: ") and current is None:
+                current = line[len("id: ") :].strip()
+            elif not current:
+                continue
+            elif line.startswith("name: "):
+                table[current] = line[len("name: ") :].strip()
+            elif line.startswith("is_obsolete: true"):
+                obsolete.add(current)
+            elif line.startswith("replaced_by: "):
+                replaced_by[current] = line[len("replaced_by: ") :].strip()
+
+    def obsolete_note(ref_id):
+        successor = replaced_by.get(ref_id)
+        return f"{ref_id} is obsolete in {core_path}" + (
+            f" (replaced_by {successor}; point the fragment at it)"
+            if successor
+            else " and has no replaced_by"
+        )
 
     problems = []
     for term_id, expected in sorted(REQUIRED_CORE_TERMS.items()):
-        actual = names.get(term_id)
+        actual = terms.get(term_id)
         if actual is None:
             problems.append(
                 f"{term_id} is not defined in {core_path} (expected {expected!r})"
@@ -444,25 +556,38 @@ def check_core_refs(core_path):
             problems.append(
                 f"{term_id} is named {actual!r} in {core_path}, expected {expected!r}"
             )
+        elif term_id in obsolete:
+            problems.append(obsolete_note(term_id))
+    for typedef_id in sorted(REQUIRED_CORE_TYPEDEFS):
+        if typedef_id not in typedefs:
+            problems.append(f"typedef {typedef_id} is not declared in {core_path}")
+        elif typedef_id in obsolete:
+            problems.append(obsolete_note(typedef_id))
     if problems:
         raise ValueError(
-            "psi-ms-core.obo no longer provides the terms this fragment references:\n  "
+            f"{core_path} no longer provides what this fragment references:\n  "
             + "\n  ".join(problems)
         )
-    return len(REQUIRED_CORE_TERMS)
+    return len(REQUIRED_CORE_TERMS) + len(REQUIRED_CORE_TYPEDEFS)
 
 
 # --- stable id assignment (the ledger) ---------------------------------------
 
 
-def read_ledger(path):
+def read_ledger(path: str) -> dict[tuple[str, str], str]:
     """Read the committed id ledger: {(company, column): "MS:nnnnnnn"}.
 
     The ledger is the sole authority for id assignment. column == "" marks a vendor
     row. Rows whose key has left the catalog stay in the ledger permanently, so a
-    retired id is never re-minted and a model that returns reclaims its old id.
-    Identity lives here, not in the fragment: names there are display labels
+    retired id is never re-minted and a model that returns under the same key reclaims
+    its old id. Identity lives here, not in the fragment: names there are display labels
     (escaped, collision-suffixed) and are never read back.
+
+    ponytail: a mirror-proven rename CONSUMES the old key's row (apply_mirror rebinds
+    it), so a rename reverted upstream mints a second id for the same physical column.
+    Retiring the old key instead needs a fourth ledger field, which is the cross-repo
+    contract repo-rt's add_psi_ms_id.py joins on -- add it there and here together, on
+    evidence that renames actually get reverted.
     """
     if not os.path.exists(path):
         raise FileNotFoundError(
@@ -470,8 +595,7 @@ def read_ledger(path):
             "Pass --reset-ids only to mint a fresh baseline (every id changes)."
         )
     ledger, bound = {}, {}
-    with open(path, encoding="utf-8") as fh:
-        lines = fh.read().split("\n")
+    lines = Path(path).read_text(encoding="utf-8").split("\n")
     if lines[0] != LEDGER_HEADER:
         raise ValueError(f"{path}: header must be {LEDGER_HEADER!r}, got {lines[0]!r}")
     for n, line in enumerate(lines[1:], start=2):
@@ -497,21 +621,23 @@ def read_ledger(path):
     return ledger
 
 
-def read_fragment_ids(path):
+def read_fragment_ids(path: str) -> set[str]:
     """Set of term ids in the previously generated fragment. Liveness only -- which
     ledger rows had a term last run, for the shrink floor and the retired/resurrected
     report. Identity never comes from here; a missing fragment just means no
     liveness info (the ids themselves are safe in the ledger)."""
-    ids = set()
     if not os.path.exists(path):
-        return ids
-    for line in open(path, encoding="utf-8"):
-        if line.startswith("id: MS:"):
-            ids.add(line[len("id: ") :].strip())
-    return ids
+        return set()
+    return {
+        line[len("id: ") :].strip()
+        for line in Path(path).read_text(encoding="utf-8").splitlines()
+        if line.startswith("id: MS:")
+    }
 
 
-def assign_ids(keys, ledger, band):
+def assign_ids(
+    keys, ledger: dict[tuple[str, str], str], band: tuple[int, int]
+) -> dict[tuple[str, str], str]:
     """Assign ids in [lo, hi]: reuse the ledger id for a known key, else the next free
     id above the highest EVER used in the band -- retired keys keep their ledger rows,
     so no id ever moves and no retired id is ever reassigned."""
@@ -538,7 +664,7 @@ def assign_ids(keys, ledger, band):
 # --- writing -----------------------------------------------------------------
 
 
-def apply_mirror(models, ledger):
+def apply_mirror(models, ledger: dict[tuple[str, str], str]):
     """Reconcile the catalog's psi_ms_id mirror column with the ledger, BEFORE any id
     is assigned. Returns (ledger, renames): the ledger with mirror-proven renames
     rebound, and the (old_key, new_key, id) transfers for the report.
@@ -622,6 +748,11 @@ def build_columns_obo(models, ledger, prior_ids=frozenset(), allow_shrink=False)
     prior_leaves = sum(
         1 for i in prior_ids if LEAF_BAND[0] <= ms_num(i) <= LEAF_BAND[1]
     )
+    if not prior_leaves:
+        print(
+            "no previously generated fragment: the "
+            f"{MIN_RETAIN_FRACTION:.0%} shrink floor is not enforced on this run"
+        )
     if (
         prior_leaves
         and len(models) < prior_leaves * MIN_RETAIN_FRACTION
@@ -634,7 +765,11 @@ def build_columns_obo(models, ledger, prior_ids=frozenset(), allow_shrink=False)
             "moves: the vanished models keep their ledger rows)."
         )
 
-    ledger, renames = apply_mirror(models, dict(ledger))
+    # An empty ledger (a --reset-ids baseline) has nothing to reconcile against: every
+    # model would look like "a new key carrying an id the ledger never minted" and abort
+    # the very run the flag exists for.
+    ledger = dict(ledger)
+    ledger, renames = apply_mirror(models, ledger) if ledger else (ledger, [])
 
     colliding = colliding_names(models)
     vendors = sorted({vendor for vendor, _ in models})
@@ -703,7 +838,9 @@ def build_columns_obo(models, ledger, prior_ids=frozenset(), allow_shrink=False)
         if (
             deviations
         ):  # rows of this model disagree on usp/mode — flag for upstream fix
-            report["deviations"].append((product, deviations))
+            # Keyed by (vendor, product), not the product name: two vendors selling the
+            # same model name would otherwise produce identical, unresolvable lines.
+            report["deviations"].append(((vendor, product), deviations))
 
     stanzas.sort(key=lambda pair: pair[0])
     body_block = "\n\n".join(text for _, text in stanzas) + "\n"
@@ -712,8 +849,9 @@ def build_columns_obo(models, ledger, prior_ids=frozenset(), allow_shrink=False)
 
 def report_markdown(models, report):
     """Markdown sync summary, printed to the Actions log and pasted into the PR body:
-    every id-ledger change (minted / renames / retired / resurrected) plus the
-    within-model data-quality deviations. One renderer so log and PR cannot drift."""
+    every id-ledger change (minted / renames / retired / resurrected), the within-model
+    data-quality deviations, and load_models' input-quality notes. One renderer so log
+    and PR cannot drift."""
 
     def key_str(key):
         company, column = key
@@ -758,13 +896,54 @@ def report_markdown(models, report):
         lines.append(
             f"### Within-model value deviations (fix upstream) — {len(report['deviations'])}"
         )
-        for product, dev in report["deviations"]:
+        for key, dev in report["deviations"]:
             for field, counts in dev.items():
-                lines.append(f"- `{product}` — {field}={counts}")
+                lines.append(f"- `{key_str(key)}` — {field}={counts}")
         lines.append("")
-    if len(lines) == 3:
-        lines.append("No id changes or within-model deviations.")
+    if report.get("unmapped_modes"):
+        lines.append(
+            f"### Unrecognised `mode` values (fix upstream) — {len(report['unmapped_modes'])}"
+        )
+        lines.append(
+            "_Not in the generator's mode vocabulary, so every term built from these "
+            "rows loses its `has_separation_mode` and its definition adjective. A whole "
+            "vocabulary drifting (e.g. a casing change) shows up here as one value with "
+            "a large count._"
+        )
+        lines += [
+            f"- `{value}` — {n} row(s)"
+            for value, n in sorted(report["unmapped_modes"].items())
+        ]
+        lines.append("")
+    if report.get("rejected_usp"):
+        lines.append(
+            f"### Unrecognised `usp` values (fix upstream) — {len(report['rejected_usp'])}"
+        )
+        lines.append(
+            "_Not USP packing codes, so they are dropped rather than published as "
+            "`usp_designation` annotations._"
+        )
+        lines += [
+            f"- `{value}` — {n} row(s)"
+            for value, n in sorted(report["rejected_usp"].items())
+        ]
+        lines.append("")
+    if report.get("dropped_rows"):
+        lines.append(
+            f"### Rows dropped for a blank company/column — {report['dropped_rows']}"
+        )
+        lines.append("")
+    if not any(report.values()):
+        lines.append("No id changes, input problems or within-model deviations.")
     return "\n".join(lines).rstrip() + "\n"
+
+
+def write_atomic(path, text):
+    """Write through a sibling temp file and os.replace, so a failed or killed run leaves
+    the previous file intact instead of a truncated one."""
+    tmp = f"{path}.tmp"
+    Path(tmp).write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
 
 
 def main():
@@ -788,6 +967,12 @@ def main():
         help="accept a large drop in model count (no id is moved or reused)",
     )
     parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="run every check and print the report, but write neither the fragment "
+        "nor the id ledger",
+    )
+    parser.add_argument(
         "--report", help="write a Markdown data-quality summary to this path"
     )
     parser.add_argument(
@@ -804,11 +989,12 @@ def main():
 
     if args.check_core_refs:
         n = check_core_refs(args.core)
-        print(f"{args.core}: all {n} referenced terms present with expected names")
+        print(f"{args.core}: all {n} referenced terms and typedefs present, live, "
+              "and named as expected")
         return
 
     check_core_refs(args.core)
-    models = load_models(args.input)
+    models, notes = load_models(args.input)
     ledger = (
         {} if args.reset_ids else read_ledger(args.mapping)
     )  # read before we overwrite it
@@ -818,20 +1004,32 @@ def main():
     obo_text, ledger_text, report = build_columns_obo(
         models, ledger, prior_ids, allow_shrink=args.allow_shrink
     )
-    open(args.output, "w", encoding="utf-8").write(obo_text)
-    print(f"wrote {args.output}")
 
-    if os.path.dirname(args.mapping):
-        os.makedirs(os.path.dirname(args.mapping), exist_ok=True)
-    open(args.mapping, "w", encoding="utf-8").write(ledger_text)
-    print(f"wrote {args.mapping}")
+    if args.dry_run:
+        print(f"dry run: {args.mapping} and {args.output} left untouched")
+    else:
+        if os.path.dirname(args.mapping):
+            os.makedirs(os.path.dirname(args.mapping), exist_ok=True)
+        # The ledger lands FIRST. It is the identity authority, so a run that dies
+        # between the two writes must leave ids recorded-but-unpublished (harmless: the
+        # next run reuses them) rather than published-but-unrecorded, which would let
+        # the next run rebind published ids to different terms.
+        write_atomic(args.mapping, ledger_text)
+        print(f"wrote {args.mapping}")
+        write_atomic(args.output, obo_text)
+        print(f"wrote {args.output}")
 
-    text = report_markdown(models, report)
+    text = report_markdown(models, {**report, **notes})
     if args.report:
-        open(args.report, "w", encoding="utf-8").write(text)
+        write_atomic(args.report, text)
         print(f"wrote {args.report}")
     print(text, end="")
 
 
 if __name__ == "__main__":
-    main()
+    # These are upstream-data and cross-file problems, not bugs: report the message and
+    # exit 1 rather than dumping a traceback into the sync job's Actions log.
+    try:
+        main()
+    except (ValueError, RuntimeError, FileNotFoundError) as exc:
+        sys.exit(f"error: {exc}")
