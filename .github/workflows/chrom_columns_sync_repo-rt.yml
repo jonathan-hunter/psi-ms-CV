@@ -98,6 +98,19 @@ jobs:
         # id movements in the PR body itself without digging through the Actions log.
         id: prbody
         run: |
+          MAX_LINES=200
+          RUN_LOG='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git diff -- .github/repo-rt/psi-ms-column-ids.tsv | tail -n +5 > ledger.diff
+
+          # Say what was cut, and only when something actually was.
+          note_if_truncated() {   # note_if_truncated <file> <what> <where-to-find-it>
+            total=$(wc -l < "$1")
+            if [ "$total" -gt "$MAX_LINES" ]; then
+              echo ''
+              echo "_($2 truncated: first ${MAX_LINES} of ${total} lines — $3.)_"
+            fi
+          }
+
           {
             echo "body<<PRBODY_EOF"
             echo 'Automated regeneration of `psi-ms-columns.obo-fragment` from the upstream'
@@ -112,7 +125,8 @@ jobs:
             echo ''
             echo '## Sync report'
             echo ''
-            cat sync-report.md
+            head -n "$MAX_LINES" sync-report.md
+            note_if_truncated sync-report.md 'report' "the full report is in the [Actions log]($RUN_LOG)"
             echo ''
             echo '## Id ledger changes (`.github/repo-rt/psi-ms-column-ids.tsv`)'
             echo ''
@@ -120,16 +134,16 @@ jobs:
               echo '(unchanged)'
             else
               echo '```diff'
-              git diff -- .github/repo-rt/psi-ms-column-ids.tsv | tail -n +5 | head -200
+              head -n "$MAX_LINES" ledger.diff
               echo '```'
               git diff --stat -- .github/repo-rt/psi-ms-column-ids.tsv | tail -1
-              echo '_(first 200 lines shown; the Files tab has the full diff)_'
+              note_if_truncated ledger.diff 'diff' 'the Files tab has it in full'
             fi
             echo 'PRBODY_EOF'
           } >> "$GITHUB_OUTPUT"
 
       - name: Remove generated scratch files
-        run: rm -f column_database.tsv sync-report.md
+        run: rm -f column_database.tsv sync-report.md ledger.diff
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6
