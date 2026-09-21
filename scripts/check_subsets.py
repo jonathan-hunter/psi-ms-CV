@@ -12,18 +12,14 @@ def check_term(term) -> bool:
     return False
 
 
-def get_subset_for_id(id: PrefixedIdent):
-    if id.prefix == 'PEFF':
-        return "PEFF"
-    elif id.prefix != 'MS':
+def get_subset_for_id(identifier: PrefixedIdent) -> str | None:
+    if identifier.prefix in {"PEFF", "UO", "NCIT"}:
+        return identifier.prefix
+    if identifier.prefix != "MS":
         return None
-    v = str(id.local)[0]
-    if v == '4':
-        return "QC"
-    elif v == '5':
-        return "columns"
-    elif v == '1':
-        return 'core'
+    if identifier.local == "0000000":
+        return "core"
+    return {"1": "core", "4": "mzQC", "5": "columns"}.get(identifier.local[:1])
 
 
 def main():
