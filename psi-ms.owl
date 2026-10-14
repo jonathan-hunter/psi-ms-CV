@@ -11,7 +11,7 @@
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:oboInOwl="http://www.geneontology.org/formats/oboInOwl#">
     <owl:Ontology rdf:about="http://purl.obolibrary.org/obo/ms.owl">
-        <owl:versionIRI rdf:resource="http://purl.obolibrary.org/obo/ms/4.2.6/ms.owl"/>
+        <owl:versionIRI rdf:resource="http://purl.obolibrary.org/obo/ms/4.2.7/ms.owl"/>
         <oboInOwl:NamespaceIdRule>* MS:$sequence(7,0,9999999)$</oboInOwl:NamespaceIdRule>
         <oboInOwl:NamespaceIdRule>* PEFF:$sequence(7,0,9999999)$</oboInOwl:NamespaceIdRule>
         <oboInOwl:date>14:10:2026 12:00</oboInOwl:date>
@@ -85469,6 +85469,30 @@
     
 
 
+    <!-- http://purl.obolibrary.org/obo/MS_1004014 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_1004014">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/BFO_0000050"/>
+                <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/ms_0000000"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <obo:IAO_0000115>This is a test term with a valid subset clause.</obo:IAO_0000115>
+        <oboInOwl:hasOBONamespace>MS</oboInOwl:hasOBONamespace>
+        <oboInOwl:id>MS:1004014</oboInOwl:id>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/ms#core"/>
+        <rdfs:label>test valid subset term</rdfs:label>
+    </owl:Class>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/MS_1004014"/>
+        <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
+        <owl:annotatedTarget>This is a test term with a valid subset clause.</owl:annotatedTarget>
+        <oboInOwl:hasDbXref>PSI:MS</oboInOwl:hasDbXref>
+    </owl:Axiom>
+    
+
+
     <!-- http://purl.obolibrary.org/obo/MS_4000000 -->
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/MS_4000000">
@@ -144151,6 +144175,12 @@
         <owl:annotatedTarget>An area unit which is equal to an area enclosed by a square with sides each 1 angstrom long.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>UOC:GVG</oboInOwl:hasDbXref>
     </owl:Axiom>
+    
+
+
+    <!-- http://purl.obolibrary.org/obo/ms_0000000 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/ms_0000000"/>
     
 
 
