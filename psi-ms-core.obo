@@ -1,5 +1,5 @@
 format-version: 1.2
-data-version: 4.2.7
+data-version: 4.2.8
 date: 14:10:2026 12:00
 saved-by: Joshua Klein
 default-namespace: MS
@@ -30229,6 +30229,13 @@ id: MS:1004014
 name: test valid subset term
 def: "This is a test term with a valid subset clause." [PSI:MS]
 subset: core
+relationship: part_of ms:0000000 ! proteomics standards initiative mass spectrometry vocabularies
+
+[Term]
+id: MS:1004015
+name: test incorrect subset term
+def: "This is a test term with a valid subset clause." [PSI:MS]
+subset: mzQC
 relationship: part_of ms:0000000 ! proteomics standards initiative mass spectrometry vocabularies
 
 [Term]
