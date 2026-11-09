@@ -71,10 +71,15 @@ def stamp_generated(core_text):
         raise ValueError("no stanza found in core; cannot locate the end of the header")
     header_text = core_text[:header_end + 1].rstrip("\n") + "\n"
     header = fastobo.loads(header_text).header
-    # Refuse to reformat: if fastobo would not write the header back as it is in core,
-    # the stamp would also rewrite unrelated header lines.
-    if str(header) != header_text:
-        raise ValueError("fastobo does not round-trip the core header byte-identically")
+    # Refuse to reformat: if fastobo would write any header line back differently from
+    # core, the stamp would also rewrite unrelated header lines. Trailing whitespace is
+    # the one exception: fastobo drops it, and it carries no meaning in OBO.
+    original = [line.rstrip() for line in header_text.splitlines()]
+    for before, after in zip(original, str(header).splitlines(), strict=True):
+        if before != after:
+            raise ValueError(
+                f"fastobo would rewrite core header line {before!r} as {after!r}"
+            )
     if any(str(c) == str(GENERATED_REMARK) for c in header):
         raise ValueError("core already carries the GENERATED FILE remark; it belongs to psi-ms.obo only")
     kinds = [type(c) for c in header]
