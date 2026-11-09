@@ -1,6 +1,6 @@
 format-version: 1.2
-data-version: 4.2.15
-date: 06:11:2026 16:30
+data-version: 4.2.16
+date: 09:11:2026 15:45
 saved-by: Jonathan Hunter
 default-namespace: MS
 subsetdef: core "Core community curated PSI-MS controlled vocabulary"
@@ -30242,6 +30242,13 @@ def: "Agilent 7100 capillary electrophoresis system (G7100A) with integrated UV-
 subset: core
 synonym: "7100 Capillary Electrophoresis System" EXACT []
 synonym: "G7100A" EXACT []
+is_a: MS:1004043 ! Agilent capillary electrophoresis system model
+
+[Term]
+id: MS:1004046
+name: test capillary electrophoresis system model
+def: "Test term added to exercise the contribution workflow on a fork. Not for release." [PSI:MS]
+subset: core
 is_a: MS:1004043 ! Agilent capillary electrophoresis system model
 
 [Term]
