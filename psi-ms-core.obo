@@ -30247,6 +30247,7 @@ is_a: MS:1004043 ! Agilent capillary electrophoresis system model
 id: MS:1004046
 name: test a good change
 def: "This is a test edit done right." [PSI:MS]
+subset: core
 is_a: MS:1004043 ! Agilent capillary electrophoresis system model
 
 [Term]
