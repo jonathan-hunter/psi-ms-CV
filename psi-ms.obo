@@ -30252,6 +30252,13 @@ subset: core
 is_a: MS:1004043 ! Agilent capillary electrophoresis system model
 
 [Term]
+id: MS:1004047
+name: test hand-edited term
+def: "Test term added directly to the generated psi-ms.obo, which CI must reject. Not for release." [PSI:MS]
+subset: core
+is_a: MS:1004043 ! Agilent capillary electrophoresis system model
+
+[Term]
 id: MS:4000000
 name: PSI-MS CV Quality Control Vocabulary
 def: "PSI Quality Control controlled vocabulary term." [PSI:MS]
