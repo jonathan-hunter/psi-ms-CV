@@ -10,6 +10,8 @@ import argparse
 import re
 import sys
 
+import fastobo
+
 CORE_DEFAULT = "psi-ms-core.obo"
 FRAGMENT_DEFAULT = "psi-ms-columns.obo-fragment"
 OUTPUT_DEFAULT = "psi-ms.obo"
@@ -19,8 +21,8 @@ MS_ID_LINE = re.compile(r"^id: MS:\S+$", re.MULTILINE)
 # Stamped into the release header so anyone opening psi-ms.obo is told it is generated.
 # check-release-obo-built.yml fails any change to psi-ms.obo that a rebuild does not
 # reproduce, so a hand edit cannot merge either way.
-GENERATED_REMARK = (
-    "remark: GENERATED FILE, do not edit. psi-ms.obo is built by "
+GENERATED_REMARK = fastobo.header.RemarkClause(
+    "GENERATED FILE, do not edit. psi-ms.obo is built by "
     "scripts/build_release_obo.py from psi-ms-core.obo and psi-ms-columns.obo-fragment. "
     "Edit psi-ms-core.obo instead."
 )
@@ -58,15 +60,31 @@ def splice(core_text, fragment_text):
 
 
 def stamp_generated(core_text):
-    """Add GENERATED_REMARK as the first remark of the header (or as its last line when
-    the header has no remarks)."""
+    """Add GENERATED_REMARK as the first remark of the header. With no remarks it goes
+    before the ontology clause, where OBO 1.4 serialisation order puts remarks.
+
+    fastobo parses the header and serialises it back after the insert. Only the header
+    is re-serialised: the stanzas are passed through as text, so term formatting in the
+    release stays exactly as written in core."""
     header_end = core_text.find("\n[")
     if header_end == -1:
         raise ValueError("no stanza found in core; cannot locate the end of the header")
-    header = core_text[:header_end + 1]
-    at = header.find("\nremark: ")
-    at = header_end + 1 if at == -1 else at + 1
-    return core_text[:at] + GENERATED_REMARK + "\n" + core_text[at:]
+    header_text = core_text[:header_end + 1].rstrip("\n") + "\n"
+    header = fastobo.loads(header_text).header
+    # Refuse to reformat: if fastobo would not write the header back as it is in core,
+    # the stamp would also rewrite unrelated header lines.
+    if str(header) != header_text:
+        raise ValueError("fastobo does not round-trip the core header byte-identically")
+    if any(str(c) == str(GENERATED_REMARK) for c in header):
+        raise ValueError("core already carries the GENERATED FILE remark; it belongs to psi-ms.obo only")
+    kinds = [type(c) for c in header]
+    at = next(
+        (kinds.index(k) for k in (fastobo.header.RemarkClause, fastobo.header.OntologyClause)
+         if k in kinds),
+        len(header),
+    )
+    header.insert(at, GENERATED_REMARK)
+    return str(header) + core_text[len(header_text):]
 
 
 def main():
