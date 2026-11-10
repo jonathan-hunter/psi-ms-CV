@@ -11,7 +11,7 @@ The vocabulary is maintained as two source files and released as two generated o
 
 - **psi-ms-core.obo**: This file is the main source of the PSI-MS CV terms. All hand-written changes should be made here, including additions and edits. It carries the `data-version` the release is stamped with, and declares every typedef and subset the vocabulary uses.
 - **psi-ms-columns.obo-fragment**: Chromatographic column models (MS:5000000–MS:5999999), derived from the [RepoRT column database](https://github.com/michaelwitting/RepoRT). Term stanzas only, with no header — it is not a standalone OBO document.
-- **psi-ms.obo**: This is a read-only release artefact built from the two above. The build also adds a `"<vendor> <model>" EXACT` synonym to every instrument, chromatography system, capillary electrophoresis system and column model (e.g. `Thermo Scientific Q Exactive`), derived from the vendor class each model sits under. Do not add these synonyms to the sources by hand.
+- **psi-ms.obo**: This is a read-only release artefact built from the two above.
 - **psi-ms.owl**: This is a read-only release artefact generated from **psi-ms.obo**..
 
 > The [robot.jar tool](https://github.com/ontodev/robot/) is used to convert from obo format to owl. 
