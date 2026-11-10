@@ -1,7 +1,7 @@
 name: "Build release OBO"
 
 # Splices psi-ms-columns.obo-fragment into psi-ms-core.obo to produce psi-ms.obo, the
-# release artefact.
+# release artefact, and adds the generated "<vendor> <model>" synonyms.
 
 on:
   push:
@@ -9,6 +9,7 @@ on:
     paths:
       - "psi-ms-core.obo"
       - "psi-ms-columns.obo-fragment"
+      - "scripts/build_release_obo.py"
   workflow_dispatch: {}
 
 jobs:
@@ -48,7 +49,7 @@ jobs:
           title: Update release OBO file
           body: |
             psi-ms.obo rebuilt from `psi-ms-core.obo` and `psi-ms-columns.obo-fragment`
-            by `scripts/build_release_obo.py`.
+            by `scripts/build_release_obo.py`, with generated "<vendor> <model>" synonyms.
 
             **This PR is the manual review gate for the release chain.** Please review and merge it to continue the release process.
             Auto-merge workflow to be re-enabled once the release chain is fully tested and stable.
