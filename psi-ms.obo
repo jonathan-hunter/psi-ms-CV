@@ -1,5 +1,5 @@
 format-version: 1.2
-data-version: 4.2.16
+data-version: 4.2.18
 date: 09:11:2026 15:45
 saved-by: Jonathan Hunter
 default-namespace: MS
@@ -30248,6 +30248,13 @@ is_a: MS:1004043 ! Agilent capillary electrophoresis system model
 id: MS:1004046
 name: test capillary electrophoresis system model
 def: "Test term added to exercise the contribution workflow on a fork. Not for release." [PSI:MS]
+subset: core
+is_a: MS:1004043 ! Agilent capillary electrophoresis system model
+
+[Term]
+id: MS:1004047
+name: test capillary electrophoresis system model 2
+def: "Test term added to exercise the release workflow on a fork. Not for release." [PSI:MS]
 subset: core
 is_a: MS:1004043 ! Agilent capillary electrophoresis system model
 
